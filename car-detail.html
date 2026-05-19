@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Car Details – Eutopia Motors</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Lightbox */
+    #lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.93); z-index:9999; flex-direction:column; align-items:center; justify-content:center; }
+    #lightbox.open { display:flex; }
+    #lbImg { max-width:92vw; max-height:82vh; object-fit:contain; border-radius:6px; }
+    .lb-close { position:absolute; top:16px; right:20px; background:none; border:none; color:#fff; font-size:2rem; cursor:pointer; line-height:1; }
+    .lb-nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.12); border:none; color:#fff; font-size:2.2rem; width:48px; height:64px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s; }
+    .lb-nav:hover { background:rgba(255,255,255,0.25); }
+    .lb-prev { left:12px; }
+    .lb-next { right:12px; }
+    .lb-counter { position:absolute; bottom:20px; color:rgba(255,255,255,0.7); font-size:0.85rem; }
+    .lb-thumbs { display:flex; gap:8px; position:absolute; bottom:50px; max-width:90vw; overflow-x:auto; padding:0 8px; }
+    .lb-thumbs img { width:60px; height:45px; object-fit:cover; border-radius:4px; cursor:pointer; opacity:0.5; border:2px solid transparent; flex-shrink:0; }
+    .lb-thumbs img.active { opacity:1; border-color:#fff; }
+    /* Make main gallery image clickable */
+    .main-image { cursor:zoom-in; }
+  </style>
 </head>
 <body>
 
@@ -48,6 +65,16 @@
 <footer style="background:var(--primary);color:rgba(255,255,255,0.6);padding:30px 0;text-align:center;font-size:0.85rem">
   <div>© 2025 Eutopia Motors (Pty) Ltd &nbsp;|&nbsp; <a href="inventory.html" style="color:var(--gold)">Back to Inventory</a></div>
 </footer>
+
+<!-- Lightbox -->
+<div id="lightbox" onclick="if(event.target===this) closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <button class="lb-nav lb-prev" onclick="lbNav(-1)">‹</button>
+  <img id="lbImg" src="" alt="Photo">
+  <button class="lb-nav lb-next" onclick="lbNav(1)">›</button>
+  <div class="lb-thumbs" id="lbThumbs"></div>
+  <div class="lb-counter" id="lbCounter"></div>
+</div>
 
 <div class="toast-container" id="toastContainer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -199,6 +226,41 @@
       document.getElementById('mainImgEl').src = imagesArr[i];
       document.querySelectorAll('#thumbs img').forEach((t, idx) => t.classList.toggle('active', idx === i));
     };
+    // Click main image to open lightbox
+    document.getElementById('mainImgEl').addEventListener('click', () => openLightbox(imgIdx));
+
+    // Lightbox
+    let lbIdx = 0;
+    window.openLightbox = function(i) {
+      lbIdx = i;
+      document.getElementById('lightbox').classList.add('open');
+      document.getElementById('lbImg').src = imagesArr[lbIdx];
+      document.getElementById('lbCounter').textContent = `${lbIdx + 1} / ${imagesArr.length}`;
+      const thumbs = document.getElementById('lbThumbs');
+      if (!thumbs.children.length) {
+        thumbs.innerHTML = imagesArr.map((url, idx) =>
+          `<img src="${url}" class="${idx===lbIdx?'active':''}" onclick="lbGoTo(${idx})" onerror="this.style.display='none'">`).join('');
+      }
+      thumbs.querySelectorAll('img').forEach((t, idx) => t.classList.toggle('active', idx === lbIdx));
+      document.body.style.overflow = 'hidden';
+    };
+    window.closeLightbox = function() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    };
+    window.lbNav = function(dir) {
+      lbIdx = (lbIdx + dir + imagesArr.length) % imagesArr.length;
+      document.getElementById('lbImg').src = imagesArr[lbIdx];
+      document.getElementById('lbCounter').textContent = `${lbIdx + 1} / ${imagesArr.length}`;
+      document.getElementById('lbThumbs').querySelectorAll('img').forEach((t, idx) => t.classList.toggle('active', idx === lbIdx));
+    };
+    window.lbGoTo = function(i) { lbIdx = i; window.lbNav(0); };
+    document.addEventListener('keydown', e => {
+      if (!document.getElementById('lightbox').classList.contains('open')) return;
+      if (e.key === 'ArrowRight') lbNav(1);
+      if (e.key === 'ArrowLeft') lbNav(-1);
+      if (e.key === 'Escape') closeLightbox();
+    });
 
     // Similar cars
     const allCars = await DB.getCars();

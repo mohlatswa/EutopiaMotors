@@ -172,6 +172,17 @@
     /* Image upload */
     .upload-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 28px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--light); }
     .upload-zone:hover, .upload-zone.drag-over { border-color: var(--primary); background: rgba(10,22,40,0.04); }
+    .photo-slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; margin-bottom: 12px; }
+    .photo-slot { border: 2px dashed var(--border); border-radius: 8px; aspect-ratio: 4/3; position: relative; overflow: hidden; background: var(--light); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; transition: all 0.2s; }
+    .photo-slot:hover { border-color: var(--primary); background: rgba(10,22,40,0.04); }
+    .photo-slot.filled { border-style: solid; border-color: var(--primary); }
+    .photo-slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .photo-slot-label { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(10,22,40,0.78); color: #fff; font-size: 0.65rem; text-align: center; padding: 4px; font-weight: 700; letter-spacing: 0.03em; }
+    .photo-slot.filled .photo-slot-label { color: var(--gold); }
+    .photo-slot-remove { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.65); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; z-index: 2; }
+    .photo-slot-empty-icon { font-size: 1.4rem; opacity: 0.4; }
+    .photo-slot-empty-text { font-size: 0.68rem; color: var(--text-muted); }
+    .photo-slot-main-badge { position: absolute; top: 4px; left: 4px; background: var(--gold); color: var(--primary); font-size: 0.6rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; z-index: 2; }
     .img-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 10px; margin-top: 12px; }
     .img-preview-item { position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 4/3; background: #eee; }
     .img-preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -430,18 +441,18 @@
                 </label>
               </div>
 
-              <div class="form-section-title">Photos</div>
+              <div class="form-section-title">Photos <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted)">— first slot = main listing photo</span></div>
               <div class="form-group full">
-                <label class="form-label">Car Photos * (first photo becomes the main image)</label>
-                <div class="upload-zone" id="imgUploadZone"
+                <div class="photo-slots-grid" id="photoSlotsGrid"></div>
+                <div class="upload-zone" id="imgUploadZone" style="margin-top:4px"
                   onclick="document.getElementById('imgFileInput').click()"
                   ondragover="event.preventDefault(); this.classList.add('drag-over')"
                   ondragleave="this.classList.remove('drag-over')"
                   ondrop="handleImgDrop(event)">
                   <input type="file" id="imgFileInput" accept="image/*" multiple style="display:none" onchange="handleImgSelect(this.files)">
-                  <div style="font-size:2rem;margin-bottom:8px">📷</div>
-                  <div style="font-weight:700;color:var(--primary);font-size:0.9rem">Click to upload or drag &amp; drop</div>
-                  <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px">JPG, PNG, WEBP · Multiple photos allowed</div>
+                  <div style="font-size:1.5rem;margin-bottom:6px">📷</div>
+                  <div style="font-weight:700;color:var(--primary);font-size:0.88rem">Click or drag &amp; drop to add more photos</div>
+                  <div style="font-size:0.75rem;color:var(--text-muted);margin-top:3px">JPG, PNG, WEBP · Upload any extra angles</div>
                 </div>
                 <div class="img-preview-grid" id="imgPreviewGrid"></div>
               </div>
@@ -668,6 +679,7 @@ async function showSection(name, linkEl) {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 async function initAdmin() {
+  initPhotoSlots();
   await Promise.all([renderDashboard(), renderCarsTable(), renderSRTable(), updateSRBadge()]);
 }
 
@@ -773,6 +785,66 @@ let _existingImgUrls = [];
 const _docFiles = {};
 const _docUrls = {};
 
+const PHOTO_SLOTS = [
+  { key: 'front',     icon: '🚗', label: 'Front View' },
+  { key: 'rear',      icon: '🔙', label: 'Rear View' },
+  { key: 'left',      icon: '◀️',  label: 'Left Side' },
+  { key: 'right',     icon: '▶️',  label: 'Right Side' },
+  { key: 'interior',  icon: '🪑', label: 'Interior' },
+  { key: 'dashboard', icon: '🎛️', label: 'Dashboard' },
+  { key: 'engine',    icon: '🔧', label: 'Engine Bay' },
+  { key: 'boot',      icon: '📦', label: 'Boot/Trunk' },
+];
+const _slotFiles = {};    // key → File (new upload)
+const _slotUrls  = {};    // key → URL (existing)
+
+function initPhotoSlots() {
+  const grid = document.getElementById('photoSlotsGrid');
+  grid.innerHTML = PHOTO_SLOTS.map(s => `
+    <div class="photo-slot" id="slot_${s.key}" onclick="document.getElementById('slotInput_${s.key}').click()">
+      <input type="file" id="slotInput_${s.key}" accept="image/*" style="display:none" onchange="handleSlotUpload('${s.key}',this)">
+      <div class="photo-slot-empty-icon">${s.icon}</div>
+      <div class="photo-slot-empty-text">${s.label}</div>
+      <div class="photo-slot-label">${s.label}</div>
+    </div>`).join('');
+}
+
+function handleSlotUpload(key, input) {
+  const file = input.files[0];
+  if (!file) return;
+  _slotFiles[key] = file;
+  delete _slotUrls[key];
+  const reader = new FileReader();
+  reader.onload = e => renderSlot(key, e.target.result, true);
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function renderSlot(key, src, isNew) {
+  const slot = document.getElementById(`slot_${key}`);
+  if (!slot) return;
+  const isMain = Object.keys(_slotFiles).length === 1 && !Object.keys(_slotUrls).length && !_existingImgUrls.length && !_newImgFiles.length;
+  slot.className = 'photo-slot filled';
+  slot.innerHTML = `
+    <img src="${src}" onerror="this.src='https://placehold.co/140x105/eee/999?text=Img'">
+    <input type="file" id="slotInput_${key}" accept="image/*" style="display:none" onchange="handleSlotUpload('${key}',this)">
+    ${isNew ? '<div class="img-preview-new-badge" style="position:absolute;top:4px;left:4px;z-index:2">New</div>' : ''}
+    <button class="photo-slot-remove" onclick="event.stopPropagation();clearSlot('${key}')">✕</button>
+    <div class="photo-slot-label">${PHOTO_SLOTS.find(s=>s.key===key).label}</div>`;
+}
+
+function clearSlot(key) {
+  delete _slotFiles[key]; delete _slotUrls[key];
+  const slot = document.getElementById(`slot_${key}`);
+  const s = PHOTO_SLOTS.find(x=>x.key===key);
+  slot.className = 'photo-slot';
+  slot.innerHTML = `
+    <input type="file" id="slotInput_${key}" accept="image/*" style="display:none" onchange="handleSlotUpload('${key}',this)">
+    <div class="photo-slot-empty-icon">${s.icon}</div>
+    <div class="photo-slot-empty-text">${s.label}</div>
+    <div class="photo-slot-label">${s.label}</div>`;
+}
+
 function handleImgSelect(files) {
   Array.from(files).forEach(f => { _newImgFiles.push(f); });
   document.getElementById('imgFileInput').value = '';
@@ -791,19 +863,17 @@ function renderImgPreviews() {
     d.className = 'img-preview-item';
     d.innerHTML = `<img src="${url}" onerror="this.src='https://placehold.co/120x90/eee/999?text=Img'">
       <button class="img-preview-remove" onclick="removeExistingImg(${i})">✕</button>
-      ${i === 0 ? '<div class="img-preview-main-label">Main</div>' : ''}`;
+      ${i === 0 ? '<div class="img-preview-main-label">Extra</div>' : ''}`;
     grid.appendChild(d);
   });
   _newImgFiles.forEach((f, i) => {
     const d = document.createElement('div');
     d.className = 'img-preview-item';
-    const isMain = _existingImgUrls.length === 0 && i === 0;
     const reader = new FileReader();
     reader.onload = e2 => {
       d.innerHTML = `<img src="${e2.target.result}">
         <button class="img-preview-remove" onclick="removeNewImg(${i})">✕</button>
-        <div class="img-preview-new-badge">New</div>
-        ${isMain ? '<div class="img-preview-main-label">Main</div>' : ''}`;
+        <div class="img-preview-new-badge">New</div>`;
     };
     reader.readAsDataURL(f);
     grid.appendChild(d);
@@ -873,6 +943,9 @@ function resetCarForm() {
   _newImgFiles.length = 0;
   _existingImgUrls.length = 0;
   document.getElementById('imgPreviewGrid').innerHTML = '';
+  Object.keys(_slotFiles).forEach(k => delete _slotFiles[k]);
+  Object.keys(_slotUrls).forEach(k => delete _slotUrls[k]);
+  initPhotoSlots();
   // reset doc state
   ['serviceHistory','registration','roadworthy','financeClearance','warranty'].forEach(key => {
     delete _docFiles[key]; delete _docUrls[key];
@@ -919,11 +992,24 @@ async function editCar(id) {
     document.getElementById('sWarranty').value = car.specs.warranty || '';
   }
 
-  // Load existing images into preview
+  // Load existing images into slots + preview
   _newImgFiles.length = 0;
   _existingImgUrls.length = 0;
+  Object.keys(_slotFiles).forEach(k => delete _slotFiles[k]);
+  Object.keys(_slotUrls).forEach(k => delete _slotUrls[k]);
+  initPhotoSlots();
   const allImgs = car.images && car.images.length ? car.images : (car.image ? [car.image] : []);
-  allImgs.forEach(url => { if (url) _existingImgUrls.push(url); });
+  const slotKeys = PHOTO_SLOTS.map(s => s.key);
+  // Try to map stored images to slot positions (by index)
+  allImgs.forEach((url, i) => {
+    if (!url) return;
+    if (i < slotKeys.length) {
+      _slotUrls[slotKeys[i]] = url;
+      renderSlot(slotKeys[i], url, false);
+    } else {
+      _existingImgUrls.push(url);
+    }
+  });
   renderImgPreviews();
 
   // Load existing docs
@@ -962,7 +1048,8 @@ async function saveCar() {
     showToast('Please fill in all required fields (*)', 'error');
     return;
   }
-  if (_existingImgUrls.length === 0 && _newImgFiles.length === 0) {
+  const hasSlotImg = Object.keys(_slotFiles).length > 0 || Object.keys(_slotUrls).length > 0;
+  if (!hasSlotImg && _existingImgUrls.length === 0 && _newImgFiles.length === 0) {
     showToast('Please upload at least one photo', 'error');
     return;
   }
@@ -973,13 +1060,24 @@ async function saveCar() {
   const editId = document.getElementById('editCarId').value;
   const carId = editId || ('EM' + String(Date.now()).slice(-6));
 
-  // Upload new images
+  // Upload slot photos in order
+  const slotImgUrls = [];
+  for (const s of PHOTO_SLOTS) {
+    if (_slotFiles[s.key]) {
+      const url = await DB.uploadCarImage(_slotFiles[s.key], carId);
+      if (url) slotImgUrls.push(url);
+    } else if (_slotUrls[s.key]) {
+      slotImgUrls.push(_slotUrls[s.key]);
+    }
+  }
+
+  // Upload extra photos
   const uploadedImgUrls = [];
   for (const file of _newImgFiles) {
     const url = await DB.uploadCarImage(file, carId);
     if (url) uploadedImgUrls.push(url);
   }
-  const allImages = [..._existingImgUrls, ...uploadedImgUrls];
+  const allImages = [...slotImgUrls, ..._existingImgUrls, ...uploadedImgUrls];
 
   // Upload new doc files
   const docData = {};
