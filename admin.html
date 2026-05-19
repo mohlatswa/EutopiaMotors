@@ -169,12 +169,24 @@
     .form-check input { width: 16px; height: 16px; accent-color: var(--primary); }
     .docs-check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-    /* Image URL list */
-    .image-url-list { display: flex; flex-direction: column; gap: 6px; }
-    .image-url-row { display: flex; gap: 6px; }
-    .image-url-row input { flex: 1; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.82rem; }
-    .image-url-row input:focus { outline: none; border-color: var(--primary); }
-    .btn-icon { background: none; border: 1.5px solid var(--border); border-radius: 6px; width: 32px; height: 32px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    /* Image upload */
+    .upload-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 28px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--light); }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: var(--primary); background: rgba(10,22,40,0.04); }
+    .img-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 10px; margin-top: 12px; }
+    .img-preview-item { position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 4/3; background: #eee; }
+    .img-preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .img-preview-remove { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.65); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; line-height:1; }
+    .img-preview-main-label { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(10,22,40,0.75); color: var(--gold); font-size: 0.68rem; text-align: center; padding: 3px; font-weight: 700; }
+    .img-preview-new-badge { position: absolute; top: 4px; left: 4px; background: var(--accent); color: #fff; font-size: 0.65rem; padding: 2px 5px; border-radius: 4px; font-weight: 700; }
+    /* Doc upload */
+    .doc-upload-list { display: flex; flex-direction: column; gap: 8px; }
+    .doc-upload-row { display: flex; align-items: center; gap: 10px; background: var(--light); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; transition: border-color 0.2s; }
+    .doc-upload-row.has-file { border-color: #16a34a; background: #f0fdf4; }
+    .doc-upload-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .doc-upload-name { flex: 1; font-size: 0.85rem; font-weight: 600; color: var(--primary); }
+    .doc-upload-status { font-size: 0.78rem; color: var(--text-muted); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .doc-upload-row.has-file .doc-upload-status { color: #16a34a; font-weight: 600; }
+    .btn-icon { background: none; border: 1.5px solid var(--border); border-radius: 6px; width: 30px; height: 30px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .btn-icon:hover { background: #FEE2E2; border-color: var(--accent); }
 
     /* Features input */
@@ -418,18 +430,20 @@
                 </label>
               </div>
 
-              <div class="form-section-title">Images</div>
+              <div class="form-section-title">Photos</div>
               <div class="form-group full">
-                <label class="form-label">Main Image URL *</label>
-                <input class="form-input" id="fMainImage" placeholder="https://…">
-              </div>
-              <div class="form-group full">
-                <label class="form-label">Gallery Image URLs (one per line)</label>
-                <div class="image-url-list" id="galleryUrlList">
-                  <div class="image-url-row"><input class="form-input" placeholder="https://… (view 1)"><button class="btn-icon" onclick="removeImgRow(this)" title="Remove">✕</button></div>
-                  <div class="image-url-row"><input class="form-input" placeholder="https://… (view 2)"><button class="btn-icon" onclick="removeImgRow(this)" title="Remove">✕</button></div>
+                <label class="form-label">Car Photos * (first photo becomes the main image)</label>
+                <div class="upload-zone" id="imgUploadZone"
+                  onclick="document.getElementById('imgFileInput').click()"
+                  ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                  ondragleave="this.classList.remove('drag-over')"
+                  ondrop="handleImgDrop(event)">
+                  <input type="file" id="imgFileInput" accept="image/*" multiple style="display:none" onchange="handleImgSelect(this.files)">
+                  <div style="font-size:2rem;margin-bottom:8px">📷</div>
+                  <div style="font-weight:700;color:var(--primary);font-size:0.9rem">Click to upload or drag &amp; drop</div>
+                  <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px">JPG, PNG, WEBP · Multiple photos allowed</div>
                 </div>
-                <button class="btn btn-outline btn-sm" style="align-self:flex-start;margin-top:8px" onclick="addImgRow()">+ Add Image URL</button>
+                <div class="img-preview-grid" id="imgPreviewGrid"></div>
               </div>
 
               <div class="form-section-title">Specifications</div>
@@ -476,14 +490,49 @@
                 <textarea class="form-textarea" id="fDescription" rows="4" placeholder="Describe the vehicle, condition, history, etc."></textarea>
               </div>
 
-              <div class="form-section-title">Documents Available</div>
+              <div class="form-section-title">Documents</div>
               <div class="form-group full">
-                <div class="docs-check-grid">
-                  <label class="form-check"><input type="checkbox" id="docService"> 🔧 Service History</label>
-                  <label class="form-check"><input type="checkbox" id="docRegistration"> 📄 Registration Papers</label>
-                  <label class="form-check"><input type="checkbox" id="docRoadworthy"> 🛡️ Roadworthy Certificate</label>
-                  <label class="form-check"><input type="checkbox" id="docFinance"> 🏦 Finance Clearance</label>
-                  <label class="form-check"><input type="checkbox" id="docWarranty"> ⭐ Warranty Certificate</label>
+                <div class="doc-upload-list">
+                  <div class="doc-upload-row" id="docRow_serviceHistory">
+                    <div class="doc-upload-icon">🔧</div>
+                    <div class="doc-upload-name">Service History</div>
+                    <div class="doc-upload-status" id="docStatus_serviceHistory">No file</div>
+                    <input type="file" id="docFile_serviceHistory" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleDocSelect('serviceHistory',this)">
+                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('docFile_serviceHistory').click()">Upload</button>
+                    <button class="btn-icon" id="docClear_serviceHistory" style="display:none" onclick="clearDoc('serviceHistory')" title="Remove">✕</button>
+                  </div>
+                  <div class="doc-upload-row" id="docRow_registration">
+                    <div class="doc-upload-icon">📄</div>
+                    <div class="doc-upload-name">Registration Papers</div>
+                    <div class="doc-upload-status" id="docStatus_registration">No file</div>
+                    <input type="file" id="docFile_registration" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleDocSelect('registration',this)">
+                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('docFile_registration').click()">Upload</button>
+                    <button class="btn-icon" id="docClear_registration" style="display:none" onclick="clearDoc('registration')" title="Remove">✕</button>
+                  </div>
+                  <div class="doc-upload-row" id="docRow_roadworthy">
+                    <div class="doc-upload-icon">🛡️</div>
+                    <div class="doc-upload-name">Roadworthy Certificate</div>
+                    <div class="doc-upload-status" id="docStatus_roadworthy">No file</div>
+                    <input type="file" id="docFile_roadworthy" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleDocSelect('roadworthy',this)">
+                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('docFile_roadworthy').click()">Upload</button>
+                    <button class="btn-icon" id="docClear_roadworthy" style="display:none" onclick="clearDoc('roadworthy')" title="Remove">✕</button>
+                  </div>
+                  <div class="doc-upload-row" id="docRow_financeClearance">
+                    <div class="doc-upload-icon">🏦</div>
+                    <div class="doc-upload-name">Finance Clearance</div>
+                    <div class="doc-upload-status" id="docStatus_financeClearance">No file</div>
+                    <input type="file" id="docFile_financeClearance" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleDocSelect('financeClearance',this)">
+                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('docFile_financeClearance').click()">Upload</button>
+                    <button class="btn-icon" id="docClear_financeClearance" style="display:none" onclick="clearDoc('financeClearance')" title="Remove">✕</button>
+                  </div>
+                  <div class="doc-upload-row" id="docRow_warranty">
+                    <div class="doc-upload-icon">⭐</div>
+                    <div class="doc-upload-name">Warranty Certificate</div>
+                    <div class="doc-upload-status" id="docStatus_warranty">No file</div>
+                    <input type="file" id="docFile_warranty" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleDocSelect('warranty',this)">
+                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('docFile_warranty').click()">Upload</button>
+                    <button class="btn-icon" id="docClear_warranty" style="display:none" onclick="clearDoc('warranty')" title="Remove">✕</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -719,16 +768,66 @@ async function quickFeaturedChange(id, featured) {
 // ── ADD / EDIT CAR FORM ───────────────────────────────────────────────────────
 let featuresList = [];
 
-function addImgRow() {
-  const list = document.getElementById('galleryUrlList');
-  const row = document.createElement('div');
-  row.className = 'image-url-row';
-  row.innerHTML = `<input class="form-input" placeholder="https://…"><button class="btn-icon" onclick="removeImgRow(this)" title="Remove">✕</button>`;
-  list.appendChild(row);
-}
+let _newImgFiles = [];
+let _existingImgUrls = [];
+const _docFiles = {};
+const _docUrls = {};
 
-function removeImgRow(btn) {
-  btn.parentElement.remove();
+function handleImgSelect(files) {
+  Array.from(files).forEach(f => { _newImgFiles.push(f); });
+  document.getElementById('imgFileInput').value = '';
+  renderImgPreviews();
+}
+function handleImgDrop(e) {
+  e.preventDefault();
+  document.getElementById('imgUploadZone').classList.remove('drag-over');
+  handleImgSelect(e.dataTransfer.files);
+}
+function renderImgPreviews() {
+  const grid = document.getElementById('imgPreviewGrid');
+  grid.innerHTML = '';
+  _existingImgUrls.forEach((url, i) => {
+    const d = document.createElement('div');
+    d.className = 'img-preview-item';
+    d.innerHTML = `<img src="${url}" onerror="this.src='https://placehold.co/120x90/eee/999?text=Img'">
+      <button class="img-preview-remove" onclick="removeExistingImg(${i})">✕</button>
+      ${i === 0 ? '<div class="img-preview-main-label">Main</div>' : ''}`;
+    grid.appendChild(d);
+  });
+  _newImgFiles.forEach((f, i) => {
+    const d = document.createElement('div');
+    d.className = 'img-preview-item';
+    const isMain = _existingImgUrls.length === 0 && i === 0;
+    const reader = new FileReader();
+    reader.onload = e2 => {
+      d.innerHTML = `<img src="${e2.target.result}">
+        <button class="img-preview-remove" onclick="removeNewImg(${i})">✕</button>
+        <div class="img-preview-new-badge">New</div>
+        ${isMain ? '<div class="img-preview-main-label">Main</div>' : ''}`;
+    };
+    reader.readAsDataURL(f);
+    grid.appendChild(d);
+  });
+}
+function removeExistingImg(i) { _existingImgUrls.splice(i, 1); renderImgPreviews(); }
+function removeNewImg(i) { _newImgFiles.splice(i, 1); renderImgPreviews(); }
+
+function handleDocSelect(key, input) {
+  const file = input.files[0];
+  if (!file) return;
+  _docFiles[key] = file;
+  delete _docUrls[key];
+  document.getElementById(`docStatus_${key}`).textContent = file.name;
+  document.getElementById(`docRow_${key}`).classList.add('has-file');
+  document.getElementById(`docClear_${key}`).style.display = 'flex';
+}
+function clearDoc(key) {
+  delete _docFiles[key];
+  delete _docUrls[key];
+  document.getElementById(`docFile_${key}`).value = '';
+  document.getElementById(`docStatus_${key}`).textContent = 'No file';
+  document.getElementById(`docRow_${key}`).classList.remove('has-file');
+  document.getElementById(`docClear_${key}`).style.display = 'none';
 }
 
 function addFeature() {
@@ -760,7 +859,7 @@ function resetCarForm() {
   document.getElementById('editCarId').value = '';
   document.getElementById('carFormTitle').textContent = 'Add New Vehicle';
   document.getElementById('saveCarBtn').textContent = 'Save Vehicle';
-  ['fMake','fModel','fYear','fPrice','fMileage','fColor','fDealer','fMainImage','fDescription',
+  ['fMake','fModel','fYear','fPrice','fMileage','fColor','fDealer','fDescription',
    'sEngine','sPower','sTorque','sConsumption','sSeats','sDoors','sWarranty'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
@@ -770,12 +869,18 @@ function resetCarForm() {
     if (el) el.value = el.options[0].value;
   });
   document.getElementById('fFeatured').checked = false;
-  ['docService','docRegistration','docRoadworthy','docFinance','docWarranty'].forEach(id => {
-    document.getElementById(id).checked = false;
+  // reset image state
+  _newImgFiles.length = 0;
+  _existingImgUrls.length = 0;
+  document.getElementById('imgPreviewGrid').innerHTML = '';
+  // reset doc state
+  ['serviceHistory','registration','roadworthy','financeClearance','warranty'].forEach(key => {
+    delete _docFiles[key]; delete _docUrls[key];
+    const fi = document.getElementById(`docFile_${key}`); if (fi) fi.value = '';
+    const st = document.getElementById(`docStatus_${key}`); if (st) st.textContent = 'No file';
+    const row = document.getElementById(`docRow_${key}`); if (row) row.classList.remove('has-file');
+    const cl = document.getElementById(`docClear_${key}`); if (cl) cl.style.display = 'none';
   });
-  document.getElementById('galleryUrlList').innerHTML = `
-    <div class="image-url-row"><input class="form-input" placeholder="https://… (view 1)"><button class="btn-icon" onclick="removeImgRow(this)">✕</button></div>
-    <div class="image-url-row"><input class="form-input" placeholder="https://… (view 2)"><button class="btn-icon" onclick="removeImgRow(this)">✕</button></div>`;
   featuresList = [];
   renderFeatureTags();
 }
@@ -802,7 +907,6 @@ async function editCar(id) {
   document.getElementById('fDealer').value = car.dealer || '';
   document.getElementById('fStatus').value = car.status || 'available';
   document.getElementById('fFeatured').checked = !!car.featured;
-  document.getElementById('fMainImage').value = car.image || '';
   document.getElementById('fDescription').value = car.description || '';
 
   if (car.specs) {
@@ -815,28 +919,26 @@ async function editCar(id) {
     document.getElementById('sWarranty').value = car.specs.warranty || '';
   }
 
-  // Gallery images
-  const list = document.getElementById('galleryUrlList');
-  list.innerHTML = '';
-  const gImgs = car.images && car.images.length > 1 ? car.images.slice(1) : (car.images || []);
-  if (gImgs.length) {
-    gImgs.forEach(url => {
-      const row = document.createElement('div');
-      row.className = 'image-url-row';
-      row.innerHTML = `<input class="form-input" value="${url}"><button class="btn-icon" onclick="removeImgRow(this)">✕</button>`;
-      list.appendChild(row);
-    });
-  } else {
-    addImgRow(); addImgRow();
-  }
+  // Load existing images into preview
+  _newImgFiles.length = 0;
+  _existingImgUrls.length = 0;
+  const allImgs = car.images && car.images.length ? car.images : (car.image ? [car.image] : []);
+  allImgs.forEach(url => { if (url) _existingImgUrls.push(url); });
+  renderImgPreviews();
 
-  // Docs
+  // Load existing docs
   const d = car.docs || {};
-  document.getElementById('docService').checked = !!d.serviceHistory;
-  document.getElementById('docRegistration').checked = !!d.registration;
-  document.getElementById('docRoadworthy').checked = !!d.roadworthy;
-  document.getElementById('docFinance').checked = !!d.financeClearance;
-  document.getElementById('docWarranty').checked = !!d.warranty;
+  ['serviceHistory','registration','roadworthy','financeClearance','warranty'].forEach(key => {
+    delete _docFiles[key]; delete _docUrls[key];
+    const fi = document.getElementById(`docFile_${key}`); if (fi) fi.value = '';
+    const val = d[key];
+    const hasDoc = !!val;
+    const label = typeof val === 'string' ? 'Uploaded ✓' : (hasDoc ? 'Available ✓' : 'No file');
+    const st = document.getElementById(`docStatus_${key}`); if (st) st.textContent = label;
+    const row = document.getElementById(`docRow_${key}`); if (row) row.classList.toggle('has-file', hasDoc);
+    const cl = document.getElementById(`docClear_${key}`); if (cl) cl.style.display = hasDoc ? 'flex' : 'none';
+    if (typeof val === 'string') _docUrls[key] = val;
+  });
 
   featuresList = car.features ? [...car.features] : [];
   renderFeatureTags();
@@ -855,16 +957,44 @@ async function saveCar() {
   const transmission = document.getElementById('fTrans').value;
   const fuel = document.getElementById('fFuel').value;
   const province = document.getElementById('fProvince').value;
-  const mainImage = document.getElementById('fMainImage').value.trim();
 
-  if (!make || !model || !year || !price || !color || !body || !transmission || !fuel || !province || !mainImage) {
+  if (!make || !model || !year || !price || !color || !body || !transmission || !fuel || !province) {
     showToast('Please fill in all required fields (*)', 'error');
     return;
   }
+  if (_existingImgUrls.length === 0 && _newImgFiles.length === 0) {
+    showToast('Please upload at least one photo', 'error');
+    return;
+  }
 
-  const galleryInputs = document.querySelectorAll('#galleryUrlList input');
-  const galleryImgs = Array.from(galleryInputs).map(i => i.value.trim()).filter(Boolean);
-  const allImages = [mainImage, ...galleryImgs];
+  const saveBtn = document.getElementById('saveCarBtn');
+  saveBtn.disabled = true; saveBtn.textContent = 'Uploading…';
+
+  const editId = document.getElementById('editCarId').value;
+  const carId = editId || ('EM' + String(Date.now()).slice(-6));
+
+  // Upload new images
+  const uploadedImgUrls = [];
+  for (const file of _newImgFiles) {
+    const url = await DB.uploadCarImage(file, carId);
+    if (url) uploadedImgUrls.push(url);
+  }
+  const allImages = [..._existingImgUrls, ...uploadedImgUrls];
+
+  // Upload new doc files
+  const docData = {};
+  for (const key of ['serviceHistory','registration','roadworthy','financeClearance','warranty']) {
+    if (_docFiles[key]) {
+      const url = await DB.uploadCarDoc(_docFiles[key], carId, key);
+      docData[key] = url || true;
+    } else if (_docUrls[key]) {
+      docData[key] = _docUrls[key];
+    } else {
+      docData[key] = false;
+    }
+  }
+
+  saveBtn.textContent = 'Saving…';
 
   const carData = {
     make, model, year, price, mileage, color,
@@ -874,7 +1004,7 @@ async function saveCar() {
     dealer: document.getElementById('fDealer').value.trim() || 'Eutopia Motors',
     status: document.getElementById('fStatus').value,
     featured: document.getElementById('fFeatured').checked,
-    image: mainImage,
+    image: allImages[0] || '',
     images: allImages,
     description: document.getElementById('fDescription').value.trim(),
     features: [...featuresList],
@@ -887,22 +1017,14 @@ async function saveCar() {
       doors: parseInt(document.getElementById('sDoors').value) || '',
       warranty: document.getElementById('sWarranty').value.trim()
     },
-    docs: {
-      serviceHistory: document.getElementById('docService').checked,
-      registration: document.getElementById('docRegistration').checked,
-      roadworthy: document.getElementById('docRoadworthy').checked,
-      financeClearance: document.getElementById('docFinance').checked,
-      warranty: document.getElementById('docWarranty').checked
-    }
+    docs: docData
   };
 
-  const saveBtn = document.getElementById('saveCarBtn');
-  saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
-  const editId = document.getElementById('editCarId').value;
   if (editId) {
     await DB.updateCar(editId, carData);
     showToast('Vehicle updated successfully!', 'success');
   } else {
+    carData.id = carId;
     await DB.addCar(carData);
     showToast('New vehicle added successfully!', 'success');
   }

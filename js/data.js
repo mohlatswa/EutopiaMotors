@@ -25,7 +25,7 @@ const DB = {
   },
   async addCar(car) {
     const payload = { ...car };
-    payload.id = 'EM' + String(Date.now()).slice(-6);
+    if (!payload.id) payload.id = 'EM' + String(Date.now()).slice(-6);
     payload.date_added = new Date().toISOString().slice(0, 10);
     delete payload.dateAdded;
     const { data, error } = await _sb.from('cars').insert(payload).select().single();
@@ -73,6 +73,20 @@ const DB = {
       sellRequests: srRes.count || 0,
       featured: cars.filter(c => c.featured).length
     };
+  },
+  async uploadCarImage(file, carId) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    const path = `${carId}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await _sb.storage.from('car-images').upload(path, file, { upsert: true });
+    if (error) { console.error('uploadCarImage:', error); return null; }
+    return _sb.storage.from('car-images').getPublicUrl(path).data.publicUrl;
+  },
+  async uploadCarDoc(file, carId, docType) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    const path = `${carId}/${docType}.${ext}`;
+    const { error } = await _sb.storage.from('car-docs').upload(path, file, { upsert: true });
+    if (error) { console.error('uploadCarDoc:', error); return null; }
+    return _sb.storage.from('car-docs').getPublicUrl(path).data.publicUrl;
   },
   async signIn(email, password) {
     return await _sb.auth.signInWithPassword({ email, password });
