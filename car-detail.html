@@ -133,14 +133,18 @@
       <div class="spec-section">
         <h3>Documents & Reports</h3>
         <div class="docs-grid">
-          ${docItems.map(d => `
-          <div class="doc-item" onclick="viewDoc('${d.key}', '${d.name}')">
+          ${docItems.map(d => {
+            const val = car.docs && car.docs[d.key];
+            const hasFile = typeof val === 'string' && val.startsWith('http');
+            const isAvailable = !!val;
+            const label = hasFile ? '📎 View / Download' : (isAvailable ? '✓ Available' : '✗ Not Available');
+            return `
+          <div class="doc-item" onclick="viewDoc('${d.key}', '${d.name}')" style="${hasFile ? 'cursor:pointer' : ''}">
             <div class="doc-icon">${d.icon}</div>
             <div class="doc-name">${d.name}</div>
-            <div class="doc-status ${car.docs && car.docs[d.key] ? 'available' : 'missing'}">
-              ${car.docs && car.docs[d.key] ? '✓ Available' : '✗ Not Available'}
-            </div>
-          </div>`).join('')}
+            <div class="doc-status ${isAvailable ? 'available' : 'missing'}">${label}</div>
+          </div>`;
+          }).join('')}
         </div>
       </div>
     </div>
@@ -203,7 +207,12 @@
 
     window.viewDoc = function(key, name) {
       if (!car.docs || !car.docs[key]) { showToast(`${name} is not available for this vehicle.`, 'error'); return; }
-      showToast(`${name} is available. Contact us to receive a copy.`, 'success');
+      const val = car.docs[key];
+      if (typeof val === 'string' && val.startsWith('http')) {
+        window.open(val, '_blank');
+      } else {
+        showToast(`${name} is available. Contact us to receive a copy.`, 'success');
+      }
     };
     window.applyFinance = function() { window.location = 'sell.html#finance'; showToast('Redirecting to finance application…', 'info'); };
     window.makeOffer = function() { showToast('Offer submitted! We will contact you within 24 hours.', 'success'); };
