@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us – Eutopia Motors</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .about-hero { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); padding: 80px 0 60px; color: #fff; text-align: center; }
+    .about-hero h1 { font-size: 2.8rem; font-weight: 900; margin-bottom: 16px; }
+    .about-hero h1 span { color: var(--gold); }
+    .about-hero p { font-size: 1.1rem; color: rgba(255,255,255,0.8); max-width: 600px; margin: 0 auto; line-height: 1.8; }
+    .about-stats { background: var(--accent); padding: 40px 0; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 0; }
+    .stat-item { text-align: center; padding: 20px; border-right: 1px solid rgba(255,255,255,0.2); }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-size: 2.4rem; font-weight: 900; color: #fff; }
+    .stat-label { font-size: 0.82rem; color: rgba(255,255,255,0.8); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .about-section { padding: 70px 0; }
+    .about-section.alt { background: var(--light); }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+    .about-grid.reverse { direction: rtl; }
+    .about-grid.reverse > * { direction: ltr; }
+    .about-img { border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-hover); }
+    .about-img img { width: 100%; height: 360px; object-fit: cover; display: block; }
+    .about-text h2 { font-size: 1.9rem; font-weight: 800; color: var(--primary); margin-bottom: 16px; line-height: 1.25; }
+    .about-text h2 span { color: var(--accent); }
+    .about-text p { font-size: 0.92rem; color: var(--text); line-height: 1.85; margin-bottom: 14px; }
+    .about-text .highlight { background: var(--light); border-left: 4px solid var(--accent); padding: 14px 18px; border-radius: 0 8px 8px 0; font-style: italic; color: var(--text); margin: 20px 0; font-size: 0.9rem; line-height: 1.7; }
+    .values-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 24px; margin-top: 20px; }
+    .value-card { background: #fff; border-radius: var(--radius); padding: 28px 24px; box-shadow: var(--shadow); border-top: 4px solid var(--accent); text-align: center; transition: var(--transition); }
+    .value-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+    .value-icon { font-size: 2.2rem; margin-bottom: 14px; }
+    .value-card h3 { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+    .value-card p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; }
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 24px; margin-top: 20px; }
+    .team-card { background: #fff; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); text-align: center; transition: var(--transition); }
+    .team-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+    .team-avatar { width: 100%; height: 200px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; }
+    .team-info { padding: 18px; }
+    .team-name { font-size: 0.95rem; font-weight: 800; color: var(--primary); }
+    .team-role { font-size: 0.78rem; color: var(--accent); font-weight: 600; margin-top: 4px; }
+    .team-bio { font-size: 0.78rem; color: var(--text-muted); margin-top: 8px; line-height: 1.6; }
+    .branches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 24px; margin-top: 20px; }
+    .branch-card { background: #fff; border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); border-left: 5px solid var(--primary); transition: var(--transition); }
+    .branch-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+    .branch-name { font-size: 1.05rem; font-weight: 800; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .branch-row { display: flex; gap: 10px; font-size: 0.83rem; color: var(--text-muted); margin-bottom: 8px; align-items: flex-start; }
+    .branch-row span:first-child { flex-shrink: 0; }
+    .cta-section { background: linear-gradient(135deg, var(--primary), var(--primary-light)); padding: 70px 0; text-align: center; }
+    .cta-section h2 { color: #fff; font-size: 2rem; font-weight: 800; margin-bottom: 14px; }
+    .cta-section p { color: rgba(255,255,255,0.8); font-size: 1rem; margin-bottom: 30px; }
+    .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    @media(max-width:768px){
+      .about-grid { grid-template-columns: 1fr; gap: 30px; }
+      .about-grid.reverse { direction: ltr; }
+      .about-hero h1 { font-size: 2rem; }
+      .about-stats .stats-row { grid-template-columns: repeat(2,1fr); }
+      .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.2); }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><div class="logo-icon">E</div><div class="logo-text">Eutopia <span>Motors</span></div></a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="inventory.html">Buy a Car</a>
+      <a href="sell.html">Sell Your Car</a>
+      <a href="about.html" class="active">About Us</a>
+      <a href="admin.html" class="nav-cta">Admin</a>
+    </div>
+    <div class="nav-phone">📞 0800 EUTOPIA</div>
+    <div class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<div class="breadcrumb"><div class="container"><div class="breadcrumb-inner"><a href="index.html">Home</a><span>›</span><span>About Us</span></div></div></div>
+
+<!-- HERO -->
+<div class="about-hero">
+  <div class="container">
+    <h1>About <span>Eutopia Motors</span></h1>
+    <p>South Africa's trusted destination for quality pre-owned and new vehicles. We make buying and selling cars simple, transparent, and stress-free.</p>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="about-stats">
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat-item"><div class="stat-num">500+</div><div class="stat-label">Vehicles Sold</div></div>
+      <div class="stat-item"><div class="stat-num">12+</div><div class="stat-label">Years in Business</div></div>
+      <div class="stat-item"><div class="stat-num">4</div><div class="stat-label">Branches Nationwide</div></div>
+      <div class="stat-item"><div class="stat-num">98%</div><div class="stat-label">Customer Satisfaction</div></div>
+      <div class="stat-item"><div class="stat-num">24h</div><div class="stat-label">Finance Approval</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- OUR STORY -->
+<div class="about-section">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-text">
+        <h2>Our <span>Story</span></h2>
+        <p>Founded in 2012, Eutopia Motors began with a simple belief — that buying a car should be an exciting experience, not a stressful one. What started as a small lot in Gauteng has grown into one of South Africa's most trusted independent dealerships.</p>
+        <p>We built our reputation on honesty, transparency, and putting customers first. Every vehicle in our inventory is carefully inspected, verified, and priced fairly — no hidden fees, no pressure tactics.</p>
+        <div class="highlight">"Our name says it all — Eutopia means the ideal place. We strive to be the ideal place to find your next vehicle."<br><strong>— Eutopia Motors Founding Team</strong></div>
+        <p>Today we stock hundreds of vehicles across sedans, SUVs, bakkies, hatchbacks and more — from first-time buyer specials to premium luxury vehicles.</p>
+      </div>
+      <div class="about-img">
+        <img src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=600&q=80" alt="Eutopia Motors dealership" onerror="this.src='https://placehold.co/600x360/0A1628/fff?text=Eutopia+Motors'">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WHY CHOOSE US -->
+<div class="about-section alt">
+  <div class="container">
+    <div class="section-header">
+      <h2>Why Choose <span>Eutopia Motors</span></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="value-icon">🔍</div>
+        <h3>Fully Inspected Vehicles</h3>
+        <p>Every car undergoes a comprehensive multi-point inspection before being listed. What you see is exactly what you get.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">📋</div>
+        <h3>Verified Documentation</h3>
+        <p>Full service history, registration papers, roadworthy certificates and finance clearance available on qualifying vehicles.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">🏦</div>
+        <h3>Easy Finance</h3>
+        <p>We work with all major banks and finance houses to get you the best possible rate. Approval within 24 hours.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">🤝</div>
+        <h3>No-Pressure Sales</h3>
+        <p>Our team is here to help, not to pressure. Browse at your own pace and ask as many questions as you need.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">💰</div>
+        <h3>Best Trade-In Value</h3>
+        <p>Selling your car? We offer competitive trade-in valuations and a hassle-free process from start to finish.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">⭐</div>
+        <h3>After-Sales Support</h3>
+        <p>Our relationship doesn't end at the sale. We offer warranty options and ongoing support for every customer.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OUR TEAM -->
+<div class="about-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Meet Our <span>Team</span></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar">👨‍💼</div>
+        <div class="team-info">
+          <div class="team-name">Hennie Mohlatswa</div>
+          <div class="team-role">Director &amp; Founder</div>
+          <div class="team-bio">Over 15 years of experience in the automotive industry. Passionate about delivering exceptional customer experiences.</div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">👨‍🔧</div>
+        <div class="team-info">
+          <div class="team-name">Sales Team</div>
+          <div class="team-role">Vehicle Specialists</div>
+          <div class="team-bio">Our knowledgeable sales team is on hand to help you find the perfect vehicle to suit your needs and budget.</div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">👩‍💻</div>
+        <div class="team-info">
+          <div class="team-name">Finance Team</div>
+          <div class="team-role">Finance &amp; Insurance</div>
+          <div class="team-bio">Specialists in vehicle finance across all major banks and financial institutions. We find you the best deal.</div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">🔧</div>
+        <div class="team-info">
+          <div class="team-name">Workshop Team</div>
+          <div class="team-role">Certified Technicians</div>
+          <div class="team-bio">Our qualified technicians inspect and prepare every vehicle before it reaches our floor — quality you can trust.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BRANCHES -->
+<div class="about-section alt">
+  <div class="container">
+    <div class="section-header">
+      <h2>Our <span>Branches</span></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="branches-grid">
+      <div class="branch-card">
+        <div class="branch-name">🏢 Eutopia Motors — Johannesburg</div>
+        <div class="branch-row"><span>📍</span><span>123 Main Street, Sandton, Johannesburg, Gauteng</span></div>
+        <div class="branch-row"><span>📞</span><span>0800 EUTOPIA (038674)</span></div>
+        <div class="branch-row"><span>📧</span><span>joburg@eutopiamotor.com</span></div>
+        <div class="branch-row"><span>🕐</span><span>Mon–Fri: 08:00–17:30 · Sat: 08:00–14:00</span></div>
+      </div>
+      <div class="branch-card">
+        <div class="branch-name">🏢 Eutopia Motors — Pretoria</div>
+        <div class="branch-row"><span>📍</span><span>456 Church Street, Arcadia, Pretoria, Gauteng</span></div>
+        <div class="branch-row"><span>📞</span><span>012 345 6789</span></div>
+        <div class="branch-row"><span>📧</span><span>pretoria@eutopiamotor.com</span></div>
+        <div class="branch-row"><span>🕐</span><span>Mon–Fri: 08:00–17:30 · Sat: 08:00–14:00</span></div>
+      </div>
+      <div class="branch-card">
+        <div class="branch-name">🏢 Eutopia Motors — Cape Town</div>
+        <div class="branch-row"><span>📍</span><span>78 Voortrekker Road, Bellville, Cape Town, Western Cape</span></div>
+        <div class="branch-row"><span>📞</span><span>021 987 6543</span></div>
+        <div class="branch-row"><span>📧</span><span>capetown@eutopiamotor.com</span></div>
+        <div class="branch-row"><span>🕐</span><span>Mon–Fri: 08:00–17:30 · Sat: 09:00–13:00</span></div>
+      </div>
+      <div class="branch-card">
+        <div class="branch-name">🏢 Eutopia Motors — Durban</div>
+        <div class="branch-row"><span>📍</span><span>22 Umgeni Road, Durban North, KwaZulu-Natal</span></div>
+        <div class="branch-row"><span>📞</span><span>031 456 7890</span></div>
+        <div class="branch-row"><span>📧</span><span>durban@eutopiamotor.com</span></div>
+        <div class="branch-row"><span>🕐</span><span>Mon–Fri: 08:00–17:30 · Sat: 08:00–13:00</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="container">
+    <h2>Ready to Find Your Dream Car?</h2>
+    <p>Browse our full inventory of quality vehicles — new, used, and demo models available.</p>
+    <div class="cta-btns">
+      <a href="inventory.html" class="btn btn-primary" style="padding:14px 32px;font-size:1rem">Browse Inventory</a>
+      <a href="sell.html" class="btn btn-outline" style="padding:14px 32px;font-size:1rem;border-color:#fff;color:#fff">Sell Your Car</a>
+    </div>
+  </div>
+</div>
+
+<footer style="background:var(--primary);color:rgba(255,255,255,0.6);padding:30px 0;text-align:center;font-size:0.85rem">
+  <div>© 2025 Eutopia Motors (Pty) Ltd &nbsp;|&nbsp; <a href="index.html" style="color:var(--gold)">Back to Home</a></div>
+</footer>
+
+</body>
+</html>
