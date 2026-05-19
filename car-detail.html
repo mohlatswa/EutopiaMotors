@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Car Details – Eutopia Motors</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><div class="logo-icon">E</div><div class="logo-text">Eutopia <span>Motors</span></div></a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a><a href="inventory.html" class="active">Buy a Car</a>
+      <a href="sell.html">Sell Your Car</a><a href="admin.html" class="nav-cta">Admin</a>
+    </div>
+    <div class="nav-phone">📞 0800 EUTOPIA</div>
+    <div class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <div class="container">
+    <div class="breadcrumb-inner">
+      <a href="index.html">Home</a><span>›</span>
+      <a href="inventory.html">Buy a Car</a><span>›</span>
+      <span id="breadTitle">Loading…</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="detail-layout" id="detailLayout">
+    <div style="text-align:center;padding:80px;color:var(--text-muted)">Loading vehicle details…</div>
+  </div>
+
+  <!-- SIMILAR CARS -->
+  <div style="padding:40px 0 60px">
+    <div class="section-header">
+      <h2>Similar <span>Vehicles</span></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="cars-grid" id="similarGrid"></div>
+  </div>
+</div>
+
+<footer style="background:var(--primary);color:rgba(255,255,255,0.6);padding:30px 0;text-align:center;font-size:0.85rem">
+  <div>© 2025 Eutopia Motors (Pty) Ltd &nbsp;|&nbsp; <a href="inventory.html" style="color:var(--gold)">Back to Inventory</a></div>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/data.js"></script>
+<script>
+  (async () => {
+  const carId = new URLSearchParams(location.search).get('id');
+  const car = await DB.getCar(carId);
+
+  if (!car) {
+    document.getElementById('detailLayout').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🚗</div><h3>Vehicle not found</h3><p>This vehicle may have been sold or removed.</p><a href="inventory.html" class="btn btn-primary" style="margin-top:16px">Browse All Cars</a></div>';
+  } else {
+    document.title = `${getCarTitle(car)} – Eutopia Motors`;
+    document.getElementById('breadTitle').textContent = getCarTitle(car);
+
+    const docItems = [
+      { key: 'serviceHistory', icon: '🔧', name: 'Service History' },
+      { key: 'registration', icon: '📄', name: 'Registration Papers' },
+      { key: 'roadworthy', icon: '🛡️', name: 'Roadworthy Certificate' },
+      { key: 'financeClearance', icon: '🏦', name: 'Finance Clearance' },
+      { key: 'warranty', icon: '⭐', name: 'Warranty Certificate' }
+    ];
+
+    const imagesArr = car.images && car.images.length > 0 ? car.images : [car.image];
+
+    document.getElementById('detailLayout').innerHTML = `
+    <!-- LEFT COLUMN -->
+    <div>
+      <div class="gallery">
+        <div class="main-image" id="mainImg">
+          <img id="mainImgEl" src="${imagesArr[0]}" alt="${getCarTitle(car)}" onerror="this.src='https://placehold.co/800x500/0A1628/fff?text=No+Image'">
+          ${imagesArr.length > 1 ? `
+          <button class="gallery-nav prev" onclick="changeImg(-1)">‹</button>
+          <button class="gallery-nav next" onclick="changeImg(1)">›</button>` : ''}
+        </div>
+        ${imagesArr.length > 1 ? `
+        <div class="thumbnails" id="thumbs">
+          ${imagesArr.map((img, i) => `<img src="${img}" alt="View ${i+1}" class="${i===0?'active':''}" onclick="setImg(${i})" onerror="this.src='https://placehold.co/80x60/0A1628/fff?text=No+Image'">`).join('')}
+        </div>` : ''}
+      </div>
+
+      <div class="spec-section">
+        <h3>Vehicle Specifications</h3>
+        <table class="specs-table">
+          <tr><td>Make</td><td>${car.make}</td></tr>
+          <tr><td>Model</td><td>${car.model}</td></tr>
+          <tr><td>Year</td><td>${car.year}</td></tr>
+          <tr><td>Mileage</td><td>${formatMileage(car.mileage)}</td></tr>
+          <tr><td>Colour</td><td>${car.color}</td></tr>
+          <tr><td>Body Type</td><td>${car.body}</td></tr>
+          <tr><td>Transmission</td><td>${car.transmission}</td></tr>
+          <tr><td>Fuel Type</td><td>${car.fuel}</td></tr>
+          <tr><td>Condition</td><td style="text-transform:capitalize">${car.condition}</td></tr>
+          <tr><td>Province</td><td>${car.province}</td></tr>
+          ${car.specs ? `
+          <tr><td>Engine</td><td>${car.specs.engine || '–'}</td></tr>
+          <tr><td>Power</td><td>${car.specs.power || '–'}</td></tr>
+          <tr><td>Torque</td><td>${car.specs.torque || '–'}</td></tr>
+          <tr><td>Fuel Consumption</td><td>${car.specs.consumption || '–'}</td></tr>
+          <tr><td>Seats</td><td>${car.specs.seats || '–'}</td></tr>
+          <tr><td>Doors</td><td>${car.specs.doors || '–'}</td></tr>
+          <tr><td>Warranty</td><td>${car.specs.warranty || 'None'}</td></tr>
+          ` : ''}
+          <tr><td>Stock Number</td><td>${car.id}</td></tr>
+          <tr><td>Listed By</td><td>${car.dealer || 'Eutopia Motors'}</td></tr>
+          <tr><td>Date Listed</td><td>${car.dateAdded || '–'}</td></tr>
+        </table>
+      </div>
+
+      ${car.features && car.features.length > 0 ? `
+      <div class="spec-section">
+        <h3>Features & Options</h3>
+        <div class="features-list">
+          ${car.features.map(f => `<div class="feature-item">${f}</div>`).join('')}
+        </div>
+      </div>` : ''}
+
+      <div class="spec-section">
+        <h3>Description</h3>
+        <p style="font-size:0.92rem;color:var(--text);line-height:1.8">${car.description || 'No description available.'}</p>
+      </div>
+
+      <div class="spec-section">
+        <h3>Documents & Reports</h3>
+        <div class="docs-grid">
+          ${docItems.map(d => `
+          <div class="doc-item" onclick="viewDoc('${d.key}', '${d.name}')">
+            <div class="doc-icon">${d.icon}</div>
+            <div class="doc-name">${d.name}</div>
+            <div class="doc-status ${car.docs && car.docs[d.key] ? 'available' : 'missing'}">
+              ${car.docs && car.docs[d.key] ? '✓ Available' : '✗ Not Available'}
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN (SIDEBAR) -->
+    <div class="detail-sidebar">
+      <div class="price-card">
+        <div class="price">${formatPrice(car.price)}</div>
+        <div class="price-sub">Estimated: R ${Math.round(car.price / 60 / 1000)}k–R ${Math.round(car.price / 48 / 1000)}k/month</div>
+        <div class="badge-row">
+          <span class="status-badge ${car.status}">${car.status === 'available' ? '✓ Available' : '✗ Sold'}</span>
+          ${car.docs && car.docs.roadworthy ? '<span class="status-badge available">✓ Roadworthy</span>' : ''}
+          ${car.docs && car.docs.serviceHistory ? '<span class="status-badge available">✓ Full History</span>' : ''}
+        </div>
+        <div class="quick-specs">
+          <div class="qs-item"><div class="qs-val">${car.year}</div><div class="qs-lbl">Year</div></div>
+          <div class="qs-item"><div class="qs-val">${formatMileage(car.mileage)}</div><div class="qs-lbl">Mileage</div></div>
+          <div class="qs-item"><div class="qs-val">${car.transmission}</div><div class="qs-lbl">Gearbox</div></div>
+          <div class="qs-item"><div class="qs-val">${car.fuel}</div><div class="qs-lbl">Fuel</div></div>
+        </div>
+        ${car.status === 'available' ? `
+        <button class="btn btn-primary btn-full" style="margin-bottom:8px" onclick="applyFinance()">Apply for Finance</button>
+        <button class="btn btn-outline btn-full" onclick="makeOffer()">Make an Offer</button>` : '<div class="btn btn-dark btn-full" style="cursor:default;opacity:0.6">This vehicle has been sold</div>'}
+      </div>
+
+      <div class="contact-card">
+        <h4>📩 Enquire About This Car</h4>
+        <input class="contact-field" id="enquireName" placeholder="Your Full Name" type="text">
+        <input class="contact-field" id="enquirePhone" placeholder="Phone Number" type="tel">
+        <input class="contact-field" id="enquireEmail" placeholder="Email Address" type="email">
+        <textarea class="contact-field" id="enquireMsg" placeholder="Your message…" rows="3" style="resize:vertical">${`Hi, I am interested in the ${getCarTitle(car)} listed at ${formatPrice(car.price)}. Please contact me.`}</textarea>
+        <button class="btn btn-whatsapp btn-full" style="margin-top:8px" onclick="sendWhatsApp()">💬 WhatsApp Us</button>
+        <button class="btn btn-success btn-full" style="margin-top:8px" onclick="sendEnquiry()">📧 Send Enquiry</button>
+      </div>
+
+      <div style="background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)">
+        <h4 style="font-size:0.9rem;font-weight:700;color:var(--primary);margin-bottom:12px">📍 Dealer Information</h4>
+        <p style="font-size:0.85rem;color:var(--text-muted)">${car.dealer || 'Eutopia Motors'}</p>
+        <p style="font-size:0.82rem;color:var(--text-muted);margin-top:6px">📞 0800 EUTOPIA &nbsp;|&nbsp; Mon–Sat</p>
+        <a href="sell.html" class="btn btn-outline btn-full btn-sm" style="margin-top:12px">💰 Trade In Your Car</a>
+      </div>
+    </div>`;
+
+    // Gallery logic
+    let imgIdx = 0;
+    window.changeImg = function(dir) {
+      imgIdx = (imgIdx + dir + imagesArr.length) % imagesArr.length;
+      setImg(imgIdx);
+    };
+    window.setImg = function(i) {
+      imgIdx = i;
+      document.getElementById('mainImgEl').src = imagesArr[i];
+      document.querySelectorAll('#thumbs img').forEach((t, idx) => t.classList.toggle('active', idx === i));
+    };
+
+    // Similar cars
+    const allCars = await DB.getCars();
+    const similar = allCars.filter(c => c.id !== car.id && (c.make === car.make || c.body === car.body) && c.status === 'available').slice(0, 3);
+    document.getElementById('similarGrid').innerHTML = similar.length ? similar.map(c => buildCarCard(c)).join('') : '<p style="color:var(--text-muted)">No similar vehicles at this time.</p>';
+
+    window.viewDoc = function(key, name) {
+      if (!car.docs || !car.docs[key]) { showToast(`${name} is not available for this vehicle.`, 'error'); return; }
+      showToast(`${name} is available. Contact us to receive a copy.`, 'success');
+    };
+    window.applyFinance = function() { window.location = 'sell.html#finance'; showToast('Redirecting to finance application…', 'info'); };
+    window.makeOffer = function() { showToast('Offer submitted! We will contact you within 24 hours.', 'success'); };
+    window.sendEnquiry = function() {
+      const n = document.getElementById('enquireName').value;
+      const p = document.getElementById('enquirePhone').value;
+      if (!n || !p) { showToast('Please fill in your name and phone number.', 'error'); return; }
+      showToast('Enquiry sent! We will contact you shortly.', 'success');
+    };
+    window.sendWhatsApp = function() {
+      const msg = encodeURIComponent(`Hi Eutopia Motors, I am interested in the ${getCarTitle(car)} (${car.id}) listed at ${formatPrice(car.price)}. Please contact me.`);
+      window.open(`https://wa.me/27800387682?text=${msg}`, '_blank');
+    };
+  }
+  })();
+</script>
+</body>
+</html>

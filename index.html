@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eutopia Motors – Buy & Sell Quality Vehicles</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .brands-bar { background:#fff; padding:30px 0; border-bottom:1px solid var(--border); }
+    .brands-row { display:flex; align-items:center; justify-content:center; gap:36px; flex-wrap:wrap; }
+    .brand-item { font-size:0.88rem; font-weight:700; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase; transition:var(--transition); cursor:pointer; }
+    .brand-item:hover { color:var(--accent); }
+    .how-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:24px; }
+    .how-card { text-align:center; }
+    .how-num { width:50px; height:50px; border-radius:50%; background:var(--accent); color:#fff; font-size:1.2rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+    .how-card h3 { font-size:0.95rem; font-weight:700; color:var(--primary); margin-bottom:6px; }
+    .how-card p { font-size:0.82rem; color:var(--text-muted); }
+    .testimonials { background:#fff; }
+    .test-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:24px; }
+    .test-card { background:var(--light); border-radius:var(--radius); padding:24px; }
+    .test-stars { color:var(--gold); font-size:1.1rem; margin-bottom:10px; }
+    .test-text { font-size:0.88rem; color:var(--text); margin-bottom:14px; line-height:1.7; }
+    .test-author { display:flex; align-items:center; gap:10px; }
+    .test-avatar { width:38px; height:38px; border-radius:50%; background:var(--primary); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:0.9rem; }
+    .test-name { font-size:0.85rem; font-weight:700; color:var(--primary); }
+    .test-sub { font-size:0.75rem; color:var(--text-muted); }
+    .finance-section { background: linear-gradient(135deg, var(--primary), var(--primary-light)); padding: 70px 0; }
+    .finance-inner { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center; }
+    .finance-text h2 { color:#fff; font-size:2rem; font-weight:800; margin-bottom:12px; }
+    .finance-text p { color:rgba(255,255,255,0.75); margin-bottom:20px; }
+    .finance-calc { background:rgba(255,255,255,0.1); border-radius:12px; padding:28px; }
+    .calc-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+    .calc-field label { display:block; color:rgba(255,255,255,0.7); font-size:0.78rem; font-weight:600; margin-bottom:6px; }
+    .calc-input { width:100%; padding:10px; border:1.5px solid rgba(255,255,255,0.2); border-radius:7px; background:rgba(255,255,255,0.1); color:#fff; font-size:0.9rem; outline:none; }
+    .calc-input::placeholder { color:rgba(255,255,255,0.4); }
+    .calc-result { background:rgba(255,255,255,0.15); border-radius:8px; padding:16px; text-align:center; margin-top:12px; }
+    .calc-result .monthly { font-size:1.8rem; font-weight:800; color:var(--gold); }
+    .calc-result p { color:rgba(255,255,255,0.7); font-size:0.8rem; margin-top:4px; }
+    @media(max-width:900px){.finance-inner{grid-template-columns:1fr;} .calc-row{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">E</div>
+      <div class="logo-text">Eutopia <span>Motors</span></div>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" class="active">Home</a>
+      <a href="inventory.html">Buy a Car</a>
+      <a href="sell.html">Sell Your Car</a>
+      <a href="inventory.html?filter=bakkie">Bakkies</a>
+      <a href="inventory.html?filter=suv">SUVs</a>
+      <a href="admin.html" class="nav-cta">Admin</a>
+    </div>
+    <div class="nav-phone">📞 0800 EUTOPIA</div>
+    <div class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">🏆 South Africa's Trusted Car Marketplace</div>
+    <h1>Find Your Perfect <span>Drive</span><br>Buy or Sell with Confidence</h1>
+    <p>Browse hundreds of quality-checked vehicles or sell yours at the best price — fast, easy, and transparent.</p>
+    <div class="hero-search">
+      <input type="text" id="heroSearch" placeholder="Search by make, model or keyword…">
+      <select id="heroBody">
+        <option value="">All Types</option>
+        <option>Sedan</option><option>Hatchback</option><option>SUV</option>
+        <option>Bakkie</option><option>Coupe</option><option>MPV</option>
+      </select>
+      <select id="heroBudget">
+        <option value="">Any Budget</option>
+        <option value="200000">Under R200 000</option>
+        <option value="350000">Under R350 000</option>
+        <option value="500000">Under R500 000</option>
+        <option value="750000">Under R750 000</option>
+        <option value="1000000">Under R1 000 000</option>
+      </select>
+      <button onclick="heroSearch()">Search Cars</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num" id="statTotal">0</div><div class="lbl">Cars Listed</div></div>
+      <div class="hero-stat"><div class="num" id="statSold">0</div><div class="lbl">Cars Sold</div></div>
+      <div class="hero-stat"><div class="num">12+</div><div class="lbl">Years Experience</div></div>
+      <div class="hero-stat"><div class="num">100%</div><div class="lbl">Quality Checked</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- BRANDS -->
+<div class="brands-bar">
+  <div class="container">
+    <div class="brands-row" id="brandsRow"></div>
+  </div>
+</div>
+
+<!-- FEATURED CARS -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Featured <span>Vehicles</span></h2>
+      <p>Hand-picked quality cars at the best prices</p>
+      <div class="section-line"></div>
+    </div>
+    <div class="cars-grid" id="featuredGrid"></div>
+    <div style="text-align:center;margin-top:36px">
+      <a href="inventory.html" class="btn btn-outline btn-lg">Browse All Cars</a>
+    </div>
+  </div>
+</section>
+
+<!-- WHY CHOOSE US -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <h2>Why Choose <span>Eutopia Motors</span></h2>
+      <p>We make buying and selling vehicles simple, transparent, and trusted</p>
+      <div class="section-line"></div>
+    </div>
+    <div class="why-grid">
+      <div class="why-card"><div class="why-icon">✅</div><h3>Quality Checked</h3><p>Every vehicle undergoes a rigorous 120-point inspection before being listed.</p></div>
+      <div class="why-card"><div class="why-icon">📋</div><h3>Full Documentation</h3><p>Service history, roadworthy certificates, and finance clearance provided.</p></div>
+      <div class="why-card"><div class="why-icon">💰</div><h3>Best Prices</h3><p>Competitive pricing backed by real market data and transparent valuations.</p></div>
+      <div class="why-card"><div class="why-icon">🏦</div><h3>Easy Finance</h3><p>Finance options via Wesbank, Absa, Nedbank, and Standard Bank available.</p></div>
+      <div class="why-card"><div class="why-icon">🚗</div><h3>Trade-Ins Welcome</h3><p>Get a fair market valuation for your current vehicle when you trade in.</p></div>
+      <div class="why-card"><div class="why-icon">🛡️</div><h3>After-Sales Support</h3><p>Extended warranties and service plans available on qualifying vehicles.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA SPLIT -->
+<div class="cta-split">
+  <div class="cta-buy">
+    <div class="cta-block">
+      <h2>Looking to Buy?</h2>
+      <p>Browse our full inventory of quality-checked vehicles across all makes, models, and budgets.</p>
+      <a href="inventory.html" class="btn btn-lg">Browse Inventory</a>
+    </div>
+  </div>
+  <div class="cta-sell">
+    <div class="cta-block">
+      <h2>Want to Sell?</h2>
+      <p>Get a free valuation and sell your car fast. We handle all the paperwork and transfer costs.</p>
+      <a href="sell.html" class="btn btn-lg">Sell My Car</a>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>How It <span>Works</span></h2>
+      <p>Selling your car has never been this easy</p>
+      <div class="section-line"></div>
+    </div>
+    <div class="how-grid">
+      <div class="how-card"><div class="how-num">1</div><h3>Submit Details</h3><p>Fill in your car's details and upload photos online in minutes.</p></div>
+      <div class="how-card"><div class="how-num">2</div><h3>Get a Valuation</h3><p>Receive a free, no-obligation market valuation within 24 hours.</p></div>
+      <div class="how-card"><div class="how-num">3</div><h3>We Inspect</h3><p>Our team inspects the vehicle at your location or one of our branches.</p></div>
+      <div class="how-card"><div class="how-num">4</div><h3>Get Paid</h3><p>Accept the offer and receive payment directly into your bank account.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FINANCE CALCULATOR -->
+<section class="finance-section">
+  <div class="container">
+    <div class="finance-inner">
+      <div class="finance-text">
+        <h2>Finance Calculator</h2>
+        <p>Get an instant estimate of your monthly repayments. Subject to credit approval from our partner banks.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+          <div style="display:flex;gap:10px;align-items:center;color:rgba(255,255,255,0.7);font-size:0.88rem">
+            <span style="color:var(--gold)">🏦</span> Wesbank · Absa · Nedbank · Standard Bank
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;color:rgba(255,255,255,0.7);font-size:0.88rem">
+            <span style="color:var(--gold)">⚡</span> Pre-approval in under 60 minutes
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;color:rgba(255,255,255,0.7);font-size:0.88rem">
+            <span style="color:var(--gold)">🔒</span> No impact on your credit score to apply
+          </div>
+        </div>
+        <div style="margin-top:24px"><a href="sell.html" class="btn btn-primary btn-lg">Apply for Finance</a></div>
+      </div>
+      <div class="finance-calc">
+        <div class="calc-row">
+          <div class="calc-field"><label>Vehicle Price (R)</label><input class="calc-input" id="calcPrice" type="number" placeholder="350000" oninput="calcPayment()"></div>
+          <div class="calc-field"><label>Deposit (R)</label><input class="calc-input" id="calcDeposit" type="number" placeholder="35000" oninput="calcPayment()"></div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-field"><label>Interest Rate (%)</label><input class="calc-input" id="calcRate" type="number" placeholder="11.5" oninput="calcPayment()"></div>
+          <div class="calc-field"><label>Term (Months)</label>
+            <select class="calc-input" id="calcTerm" onchange="calcPayment()">
+              <option value="48">48 months</option><option value="60" selected>60 months</option><option value="72">72 months</option>
+            </select>
+          </div>
+        </div>
+        <div class="calc-result">
+          <div class="monthly" id="calcResult">R 0</div>
+          <p>Estimated monthly repayment (excl. insurance)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section testimonials">
+  <div class="container">
+    <div class="section-header">
+      <h2>What Our <span>Customers Say</span></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="test-grid">
+      <div class="test-card"><div class="test-stars">★★★★★</div><p class="test-text">"Bought my Ford Ranger through Eutopia and the whole process was seamless. All the documents were ready, no surprises. I drove away the same day!"</p><div class="test-author"><div class="test-avatar">TM</div><div><div class="test-name">Thabo Mkhize</div><div class="test-sub">Bought 2023 Ford Ranger · Soweto</div></div></div></div>
+      <div class="test-card"><div class="test-stars">★★★★★</div><p class="test-text">"Sold my BMW in 48 hours. The valuation was fair and they handled all the paperwork. Money was in my account the next morning. Highly recommend!"</p><div class="test-author"><div class="test-avatar">LA</div><div><div class="test-name">Lerato Abrahams</div><div class="test-sub">Sold 2021 BMW 3 Series · Johannesburg</div></div></div></div>
+      <div class="test-card"><div class="test-stars">★★★★★</div><p class="test-text">"Finally a car dealer that shows you all the documents upfront. Service history, roadworthy — everything. Will definitely buy my next car here."</p><div class="test-author"><div class="test-avatar">NZ</div><div><div class="test-name">Nomvula Zwane</div><div class="test-sub">Bought 2022 Hyundai Tucson · Durban</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo-text">Eutopia <span>Motors</span></div>
+        <p>South Africa's trusted marketplace for buying and selling quality pre-owned vehicles. All cars quality-checked and fully documented.</p>
+        <div class="footer-socials">
+          <a href="#">📘</a><a href="#">🐦</a><a href="#">📸</a><a href="#">▶️</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="inventory.html">Buy a Car</a></li>
+          <li><a href="sell.html">Sell Your Car</a></li>
+          <li><a href="inventory.html?filter=suv">SUVs</a></li>
+          <li><a href="inventory.html?filter=bakkie">Bakkies</a></li>
+          <li><a href="admin.html">Admin Panel</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#">Vehicle Finance</a></li>
+          <li><a href="#">Extended Warranty</a></li>
+          <li><a href="#">Trade-In</a></li>
+          <li><a href="#">Roadworthy Testing</a></li>
+          <li><a href="#">Insurance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <div class="footer-contact-item"><span class="icon">📞</span><span>0800 EUTOPIA (388 674)</span></div>
+        <div class="footer-contact-item"><span class="icon">📧</span><span>info@eutopiamotors.co.za</span></div>
+        <div class="footer-contact-item"><span class="icon">📍</span><span>123 Motors Drive, Midrand, Gauteng</span></div>
+        <div class="footer-contact-item"><span class="icon">🕒</span><span>Mon–Fri: 8am–6pm · Sat: 8am–4pm</span></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Eutopia Motors (Pty) Ltd. All rights reserved.</span>
+      <div style="display:flex;gap:16px"><a href="#">Privacy Policy</a><a href="#">Terms & Conditions</a><a href="#">POPIA Compliance</a></div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/data.js"></script>
+<script>
+  (async () => {
+    const [cars, stats] = await Promise.all([DB.getCars(), DB.getStats()]);
+    document.getElementById('statTotal').textContent = stats.total;
+    document.getElementById('statSold').textContent = stats.sold;
+    const makes = [...new Set(cars.map(c => c.make))];
+    document.getElementById('brandsRow').innerHTML = makes.map(m =>
+      `<span class="brand-item" onclick="window.location='inventory.html?make=${encodeURIComponent(m)}'">${m}</span>`).join('');
+    const featured = cars.filter(c => c.featured).slice(0, 6);
+    document.getElementById('featuredGrid').innerHTML = featured.map(c => buildCarCard(c)).join('') ||
+      '<p style="text-align:center;color:var(--text-muted);padding:40px">No featured cars at the moment.</p>';
+  })();
+
+  function heroSearch() {
+    const q = document.getElementById('heroSearch').value;
+    const body = document.getElementById('heroBody').value;
+    const budget = document.getElementById('heroBudget').value;
+    let url = 'inventory.html?';
+    if (q) url += `q=${encodeURIComponent(q)}&`;
+    if (body) url += `body=${encodeURIComponent(body)}&`;
+    if (budget) url += `maxPrice=${budget}&`;
+    window.location = url;
+  }
+  document.getElementById('heroSearch').addEventListener('keydown', e => { if (e.key === 'Enter') heroSearch(); });
+
+  function calcPayment() {
+    const P = parseFloat(document.getElementById('calcPrice').value || 0) - parseFloat(document.getElementById('calcDeposit').value || 0);
+    const r = parseFloat(document.getElementById('calcRate').value || 11.5) / 100 / 12;
+    const n = parseInt(document.getElementById('calcTerm').value || 60);
+    if (P <= 0 || r <= 0) { document.getElementById('calcResult').textContent = 'R 0'; return; }
+    const M = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    document.getElementById('calcResult').textContent = 'R ' + Math.round(M).toLocaleString('en-ZA');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sell Your Car – Eutopia Motors</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><div class="logo-icon">E</div><div class="logo-text">Eutopia <span>Motors</span></div></a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a><a href="inventory.html">Buy a Car</a>
+      <a href="sell.html" class="active">Sell Your Car</a><a href="admin.html" class="nav-cta">Admin</a>
+    </div>
+    <div class="nav-phone">📞 0800 EUTOPIA</div>
+    <div class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<div class="sell-hero">
+  <h1>Sell Your Car Fast & Easy</h1>
+  <p>Complete our form, upload your documents, and get a fair market offer within 24 hours.</p>
+</div>
+
+<div class="container" style="padding-top:40px;padding-bottom:60px">
+
+  <!-- STEP INDICATOR -->
+  <div class="sell-steps" id="stepsBar">
+    <div class="step-item"><div class="step-circle active" id="s1">1</div></div>
+    <div class="step-item"><div class="step-line" id="l1"></div><div class="step-circle" id="s2">2</div></div>
+    <div class="step-item"><div class="step-line" id="l2"></div><div class="step-circle" id="s3">3</div></div>
+    <div class="step-item"><div class="step-line" id="l3"></div><div class="step-circle" id="s4">4</div></div>
+    <div class="step-item"><div class="step-line" id="l4"></div><div class="step-circle" id="s5">5</div></div>
+  </div>
+
+  <div class="sell-form-card">
+
+    <!-- STEP 1: YOUR DETAILS -->
+    <div class="form-step active" id="step1">
+      <h2>Your Details</h2>
+      <p>Tell us a bit about yourself so we can get in touch.</p>
+      <div class="form-row">
+        <div class="form-group"><label>First Name <span>*</span></label><input class="form-control" id="ownerFirst" placeholder="e.g. Thabo" required></div>
+        <div class="form-group"><label>Last Name <span>*</span></label><input class="form-control" id="ownerLast" placeholder="e.g. Mkhize" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone Number <span>*</span></label><input class="form-control" id="ownerPhone" placeholder="e.g. 082 000 0000" type="tel" required></div>
+        <div class="form-group"><label>Email Address <span>*</span></label><input class="form-control" id="ownerEmail" placeholder="you@email.com" type="email" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>ID Number</label><input class="form-control" id="ownerID" placeholder="South African ID number"></div>
+        <div class="form-group"><label>Province <span>*</span></label>
+          <select class="form-control" id="ownerProvince" required>
+            <option value="">Select Province</option>
+            <option>Gauteng</option><option>Western Cape</option><option>KwaZulu-Natal</option>
+            <option>Eastern Cape</option><option>Limpopo</option><option>Mpumalanga</option>
+            <option>North West</option><option>Free State</option><option>Northern Cape</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-nav"><span></span><button class="btn btn-primary" onclick="nextStep(1)">Next: Car Details →</button></div>
+    </div>
+
+    <!-- STEP 2: CAR DETAILS -->
+    <div class="form-step" id="step2">
+      <h2>Car Details</h2>
+      <p>Provide accurate details — this helps us give you the best possible valuation.</p>
+      <div class="form-row">
+        <div class="form-group"><label>Make <span>*</span></label>
+          <select class="form-control" id="carMake" required>
+            <option value="">Select Make</option>
+            <option>Toyota</option><option>Volkswagen</option><option>Ford</option><option>BMW</option>
+            <option>Mercedes-Benz</option><option>Audi</option><option>Hyundai</option><option>Kia</option>
+            <option>Honda</option><option>Nissan</option><option>Mazda</option><option>Chevrolet</option>
+            <option>Suzuki</option><option>Renault</option><option>Peugeot</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Model <span>*</span></label><input class="form-control" id="carModel" placeholder="e.g. Polo Vivo 1.4" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Year <span>*</span></label>
+          <select class="form-control" id="carYear" required>
+            <option value="">Select Year</option>
+            <option>2025</option><option>2024</option><option>2023</option><option>2022</option>
+            <option>2021</option><option>2020</option><option>2019</option><option>2018</option>
+            <option>2017</option><option>2016</option><option>2015</option><option>2014</option>
+            <option>2013</option><option>2012</option><option>2011</option><option>2010</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Mileage (km) <span>*</span></label><input class="form-control" id="carMileage" type="number" placeholder="e.g. 85000" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Colour <span>*</span></label><input class="form-control" id="carColor" placeholder="e.g. Pearl White" required></div>
+        <div class="form-group"><label>Transmission <span>*</span></label>
+          <select class="form-control" id="carTrans" required>
+            <option value="">Select</option><option>Manual</option><option>Automatic</option><option>CVT</option><option>DCT</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Fuel Type <span>*</span></label>
+          <select class="form-control" id="carFuel" required>
+            <option value="">Select</option><option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Body Type</label>
+          <select class="form-control" id="carBody">
+            <option value="">Select</option><option>Sedan</option><option>Hatchback</option><option>SUV</option>
+            <option>Bakkie</option><option>Coupe</option><option>MPV</option><option>Crossover</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Licence Plate</label><input class="form-control" id="carPlate" placeholder="e.g. GP 000 000"></div>
+        <div class="form-group"><label>VIN Number</label><input class="form-control" id="carVIN" placeholder="17-character VIN"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Asking Price (R)</label><input class="form-control" id="carAskPrice" type="number" placeholder="e.g. 250000"></div>
+        <div class="form-group"><label>Condition <span>*</span></label>
+          <select class="form-control" id="carCondition" required>
+            <option value="">Select</option><option>Excellent</option><option>Good</option><option>Fair</option><option>Needs Work</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Additional Notes</label>
+        <textarea class="form-control" id="carNotes" rows="3" placeholder="Any additional information about the vehicle, modifications, known issues, etc."></textarea>
+      </div>
+      <div class="form-nav">
+        <button class="btn btn-outline" onclick="prevStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(2)">Next: Photos →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: PHOTOS -->
+    <div class="form-step" id="step3">
+      <h2>Upload Photos</h2>
+      <p>Add clear photos of your vehicle. More photos = better valuation. Minimum 4 photos required.</p>
+      <div class="upload-zone" id="photoZone" onclick="document.getElementById('photoInput').click()" ondrop="handleDrop(event,'photo')" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+        <div class="upload-icon">📷</div>
+        <p><strong>Click to upload</strong> or drag & drop photos here</p>
+        <small>JPG, PNG or WEBP · Max 5MB per photo · Minimum 4 photos</small>
+      </div>
+      <input type="file" id="photoInput" class="file-input-hidden" multiple accept="image/*" onchange="handlePhotos(this.files)">
+      <div class="uploaded-files" id="photoList"></div>
+      <div style="margin-top:16px;padding:12px;background:var(--light);border-radius:8px">
+        <p style="font-size:0.82rem;color:var(--text-muted);font-weight:600">📌 Photo Tips:</p>
+        <ul style="font-size:0.8rem;color:var(--text-muted);margin-top:6px;padding-left:16px">
+          <li>Front, rear, both sides, and interior views</li>
+          <li>Dashboard/odometer reading</li>
+          <li>Engine bay</li>
+          <li>Any damage or scratches</li>
+        </ul>
+      </div>
+      <div class="form-nav">
+        <button class="btn btn-outline" onclick="prevStep(3)">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(3)">Next: Documents →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: DOCUMENTS -->
+    <div class="form-step" id="step4">
+      <h2>Upload Documents</h2>
+      <p>Upload copies of your vehicle documents. This speeds up the verification process and may increase your offer.</p>
+
+      <div class="doc-upload-item">
+        <div class="doc-upload-icon">📋</div>
+        <div class="doc-upload-info"><h4>Service History Book / Stamped Records</h4><p>Proof of regular servicing increases the vehicle's value significantly.</p></div>
+        <label for="docService" style="cursor:pointer">
+          <span class="doc-upload-status" id="statusService" style="cursor:pointer">+ Upload</span>
+          <input type="file" id="docService" class="file-input-hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="markDoc('Service', this)">
+        </label>
+      </div>
+
+      <div class="doc-upload-item">
+        <div class="doc-upload-icon">📄</div>
+        <div class="doc-upload-info"><h4>Registration Certificate (RC1/Natis)</h4><p>The official vehicle registration document in your name.</p></div>
+        <label for="docReg" style="cursor:pointer">
+          <span class="doc-upload-status" id="statusReg">+ Upload</span>
+          <input type="file" id="docReg" class="file-input-hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="markDoc('Reg', this)">
+        </label>
+      </div>
+
+      <div class="doc-upload-item">
+        <div class="doc-upload-icon">🛡️</div>
+        <div class="doc-upload-info"><h4>Roadworthy Certificate</h4><p>Valid roadworthy certificate from a licensed testing station.</p></div>
+        <label for="docRW" style="cursor:pointer">
+          <span class="doc-upload-status" id="statusRW">+ Upload</span>
+          <input type="file" id="docRW" class="file-input-hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="markDoc('RW', this)">
+        </label>
+      </div>
+
+      <div class="doc-upload-item">
+        <div class="doc-upload-icon">🏦</div>
+        <div class="doc-upload-info"><h4>Finance Clearance Letter</h4><p>If the vehicle is financed, provide a settlement letter from your bank.</p></div>
+        <label for="docFinance" style="cursor:pointer">
+          <span class="doc-upload-status" id="statusFinance">+ Upload</span>
+          <input type="file" id="docFinance" class="file-input-hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="markDoc('Finance', this)">
+        </label>
+      </div>
+
+      <div class="doc-upload-item">
+        <div class="doc-upload-icon">⭐</div>
+        <div class="doc-upload-info"><h4>Warranty Certificate (if applicable)</h4><p>Any remaining manufacturer or extended warranty documentation.</p></div>
+        <label for="docWarranty" style="cursor:pointer">
+          <span class="doc-upload-status" id="statusWarranty">+ Upload</span>
+          <input type="file" id="docWarranty" class="file-input-hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="markDoc('Warranty', this)">
+        </label>
+      </div>
+
+      <div class="doc-upload-item">
+        <div class="doc-upload-icon">👤</div>
+        <div class="doc-upload-info"><h4>Copy of Owner's ID</h4><p>Clear copy of your South African ID or passport.</p></div>
+        <label for="docID" style="cursor:pointer">
+          <span class="doc-upload-status" id="statusID">+ Upload</span>
+          <input type="file" id="docID" class="file-input-hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="markDoc('ID', this)">
+        </label>
+      </div>
+
+      <div class="form-nav">
+        <button class="btn btn-outline" onclick="prevStep(4)">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(4)">Review & Submit →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: REVIEW & SUBMIT -->
+    <div class="form-step" id="step5">
+      <h2>Review & Submit</h2>
+      <p>Please review your submission before sending.</p>
+      <div id="reviewContent" style="background:var(--light);border-radius:8px;padding:20px;margin-bottom:20px;font-size:0.88rem;line-height:2"></div>
+      <div style="background:rgba(232,75,26,0.05);border:1.5px solid rgba(232,75,26,0.2);border-radius:8px;padding:16px;margin-bottom:20px">
+        <label style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:0.88rem">
+          <input type="checkbox" id="agreeTerms" style="margin-top:3px;width:16px;height:16px">
+          <span>I confirm that the information provided is accurate and that I am the registered owner of the vehicle. I agree to the <a href="#" style="color:var(--accent)">Terms & Conditions</a> and <a href="#" style="color:var(--accent)">Privacy Policy</a> of Eutopia Motors.</span>
+        </label>
+      </div>
+      <div class="form-nav">
+        <button class="btn btn-outline" onclick="prevStep(5)">← Back</button>
+        <button class="btn btn-success btn-lg" onclick="submitForm()">✓ Submit My Car</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: SUCCESS -->
+    <div class="form-step" id="stepSuccess">
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-size:64px;margin-bottom:16px">🎉</div>
+        <h2 style="font-size:1.6rem;margin-bottom:8px">Submission Received!</h2>
+        <p style="color:var(--text-muted);max-width:400px;margin:0 auto 24px">Thank you! Your vehicle has been submitted. Our team will review it and contact you within 24 hours with a valuation.</p>
+        <div id="refNumber" style="background:var(--light);border-radius:8px;padding:16px;margin-bottom:24px;display:inline-block">
+          <div style="font-size:0.8rem;color:var(--text-muted)">Your Reference Number</div>
+          <div style="font-size:1.4rem;font-weight:800;color:var(--primary);letter-spacing:2px" id="refNum"></div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+          <a href="index.html" class="btn btn-primary">Back to Home</a>
+          <a href="inventory.html" class="btn btn-outline">Browse Cars</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer style="background:var(--primary);color:rgba(255,255,255,0.6);padding:30px 0;text-align:center;font-size:0.85rem">
+  <div>© 2025 Eutopia Motors (Pty) Ltd &nbsp;|&nbsp; <a href="index.html" style="color:var(--gold)">Back to Home</a></div>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/data.js"></script>
+<script>
+  let currentStep = 1;
+  const photoFiles = [];
+  const docFiles = {};
+
+  function nextStep(from) {
+    if (!validateStep(from)) return;
+    if (from === 4) buildReview();
+    setStep(from + 1);
+  }
+  function prevStep(from) { setStep(from - 1); }
+  function setStep(n) {
+    currentStep = n;
+    for (let i = 1; i <= 5; i++) {
+      const el = document.getElementById('step' + i);
+      if (el) el.classList.toggle('active', i === n);
+    }
+    for (let i = 1; i <= 5; i++) {
+      const circle = document.getElementById('s' + i);
+      if (!circle) continue;
+      circle.classList.remove('active', 'done');
+      if (i < n) circle.classList.add('done'), circle.textContent = '✓';
+      else if (i === n) circle.classList.add('active'), circle.textContent = i;
+      else circle.textContent = i;
+      const line = document.getElementById('l' + i);
+      if (line) line.classList.toggle('done', i < n);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function validateStep(step) {
+    if (step === 1) {
+      if (!document.getElementById('ownerFirst').value || !document.getElementById('ownerPhone').value || !document.getElementById('ownerEmail').value || !document.getElementById('ownerProvince').value) {
+        showToast('Please fill in all required fields.', 'error'); return false;
+      }
+    }
+    if (step === 2) {
+      if (!document.getElementById('carMake').value || !document.getElementById('carModel').value || !document.getElementById('carYear').value || !document.getElementById('carMileage').value) {
+        showToast('Please fill in all required car details.', 'error'); return false;
+      }
+    }
+    if (step === 3) {
+      if (photoFiles.length < 2) { showToast('Please upload at least 2 photos.', 'error'); return false; }
+    }
+    return true;
+  }
+
+  function handlePhotos(files) {
+    Array.from(files).forEach(f => { if (f.size <= 5 * 1024 * 1024) photoFiles.push(f); });
+    renderPhotoList();
+  }
+  function handleDrop(e, type) {
+    e.preventDefault();
+    document.getElementById('photoZone').classList.remove('dragover');
+    handlePhotos(e.dataTransfer.files);
+  }
+  function renderPhotoList() {
+    document.getElementById('photoList').innerHTML = photoFiles.map((f, i) =>
+      `<div class="file-chip">📷 ${f.name.length > 20 ? f.name.slice(0,18)+'…' : f.name} <button onclick="removePhoto(${i})">✕</button></div>`
+    ).join('');
+  }
+  function removePhoto(i) { photoFiles.splice(i, 1); renderPhotoList(); }
+  function markDoc(key, input) {
+    if (input.files[0]) {
+      docFiles[key] = input.files[0];
+      const el = document.getElementById('status' + key);
+      el.textContent = '✓ Uploaded';
+      el.className = 'doc-upload-status uploaded';
+    }
+  }
+
+  function buildReview() {
+    const first = document.getElementById('ownerFirst').value;
+    const last = document.getElementById('ownerLast').value;
+    const phone = document.getElementById('ownerPhone').value;
+    const email = document.getElementById('ownerEmail').value;
+    const make = document.getElementById('carMake').value;
+    const model = document.getElementById('carModel').value;
+    const year = document.getElementById('carYear').value;
+    const mileage = document.getElementById('carMileage').value;
+    const color = document.getElementById('carColor').value;
+    const askPrice = document.getElementById('carAskPrice').value;
+    document.getElementById('reviewContent').innerHTML = `
+      <strong>Owner:</strong> ${first} ${last}<br>
+      <strong>Phone:</strong> ${phone}<br>
+      <strong>Email:</strong> ${email}<br>
+      <strong>Vehicle:</strong> ${year} ${make} ${model}<br>
+      <strong>Mileage:</strong> ${Number(mileage).toLocaleString('en-ZA')} km<br>
+      <strong>Colour:</strong> ${color || '–'}<br>
+      <strong>Asking Price:</strong> ${askPrice ? formatPrice(askPrice) : 'Open to offer'}<br>
+      <strong>Photos Uploaded:</strong> ${photoFiles.length}<br>
+      <strong>Documents Uploaded:</strong> ${Object.keys(docFiles).length}
+    `;
+  }
+
+  async function submitForm() {
+    if (!document.getElementById('agreeTerms').checked) { showToast('Please agree to the terms and conditions.', 'error'); return; }
+    const btn = document.querySelector('#step5 .btn-success');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Submitting…'; }
+    const req = {
+      owner: {
+        firstName: document.getElementById('ownerFirst').value,
+        lastName: document.getElementById('ownerLast').value,
+        phone: document.getElementById('ownerPhone').value,
+        email: document.getElementById('ownerEmail').value,
+        idNumber: document.getElementById('ownerID').value,
+        province: document.getElementById('ownerProvince').value
+      },
+      car: {
+        make: document.getElementById('carMake').value,
+        model: document.getElementById('carModel').value,
+        year: document.getElementById('carYear').value,
+        mileage: document.getElementById('carMileage').value,
+        color: document.getElementById('carColor').value,
+        transmission: document.getElementById('carTrans').value,
+        fuel: document.getElementById('carFuel').value,
+        body: document.getElementById('carBody').value,
+        plate: document.getElementById('carPlate').value,
+        vin: document.getElementById('carVIN').value,
+        askingPrice: document.getElementById('carAskPrice').value,
+        condition: document.getElementById('carCondition').value,
+        notes: document.getElementById('carNotes').value
+      },
+      photos: photoFiles.length,
+      docs: Object.keys(docFiles)
+    };
+    const saved = await DB.addSellRequest(req);
+    document.getElementById('refNum').textContent = saved.id;
+    for (let i = 1; i <= 5; i++) { const el = document.getElementById('step' + i); if(el) el.classList.remove('active'); }
+    document.getElementById('stepSuccess').classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    showToast('Submission received! We\'ll be in touch soon.', 'success');
+  }
+</script>
+</body>
+</html>
