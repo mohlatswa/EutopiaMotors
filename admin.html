@@ -229,7 +229,7 @@
     <h2>Eutopia Motors</h2>
     <p>Admin Portal — Authorised Access Only</p>
     <div id="loginError" class="login-error">Incorrect username or password.</div>
-    <input class="login-field" id="loginEmail" type="email" placeholder="mohlatswa96@gmail.com" autocomplete="email">
+    <input class="login-field" id="loginEmail" type="text" placeholder="Username" autocomplete="username">
     <input class="login-field" id="loginPass" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()">
     <button class="btn btn-primary btn-full" style="padding:12px" onclick="doLogin()">Sign In</button>
     <p style="font-size:0.75rem;color:var(--text-muted);margin-top:18px"><a href="index.html" style="color:var(--text-muted)">← Back to Website</a></p>
@@ -570,8 +570,10 @@
 <script src="js/data.js"></script>
 <script>
 // ── AUTH (Supabase) ────────────────────────────────────────────────────────────
+const _adminMap = { 'admin': 'admin@eutopiamotor.com', 'mohlatswa': 'mohlatswa96@gmail.com' };
 async function doLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
+  const input = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const email = _adminMap[input] || input;
   const pass  = document.getElementById('loginPass').value;
   const err   = document.getElementById('loginError');
   const btn   = document.querySelector('#loginScreen .btn-primary');
