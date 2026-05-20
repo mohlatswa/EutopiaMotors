@@ -289,6 +289,7 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/data.js"></script>
+<script src="js/security.js"></script>
 <script>
   let currentStep = 1;
   const photoFiles = [];
@@ -388,6 +389,24 @@
     if (!document.getElementById('agreeTerms').checked) { showToast('Please agree to the terms and conditions.', 'error'); return; }
     const btn = document.querySelector('#step5 .btn-success');
     if (btn) { btn.disabled = true; btn.textContent = '⏳ Submitting…'; }
+
+    // Security: scan text inputs for XSS/injection attempts
+    if (window.SEC) {
+      const checks = [
+        ['ownerFirst','First Name'], ['ownerLast','Last Name'],
+        ['carModel','Car Model'], ['carPlate','Licence Plate'],
+        ['carVIN','VIN Number'], ['carNotes','Notes']
+      ];
+      for (const [id, label] of checks) {
+        const val = document.getElementById(id).value;
+        if (val && !SEC.scanInput(val, label)) {
+          showToast('Invalid input detected. Please check your entries.', 'error');
+          if (btn) { btn.disabled = false; btn.textContent = '✓ Submit My Car'; }
+          return;
+        }
+      }
+      SEC.trackFormSubmit('sell_request');
+    }
     const req = {
       owner: {
         firstName: document.getElementById('ownerFirst').value,

@@ -227,6 +227,24 @@
     /* Quick edit status */
     .status-select { padding: 4px 8px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.78rem; background: #fff; cursor: pointer; }
 
+    /* Security section */
+    .sec-banner { display:none; background:#FEF2F2; border:1.5px solid #FCA5A5; border-radius:10px; padding:14px 18px; margin-bottom:20px; align-items:center; gap:12px; }
+    .sec-banner.show { display:flex; }
+    .sec-score-bar { height:8px; background:var(--border); border-radius:4px; overflow:hidden; margin-top:8px; }
+    .sec-score-fill { height:100%; border-radius:4px; transition:width 0.8s ease; }
+    .rec-item { display:flex; gap:10px; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .rec-item:last-child { border-bottom:none; margin-bottom:0; }
+    .rec-item.done { opacity:0.5; }
+    .rec-icon { font-size:1rem; flex-shrink:0; margin-top:1px; }
+    .rec-title { font-size:0.82rem; font-weight:700; color:var(--primary); }
+    .rec-desc  { font-size:0.75rem; color:var(--text-muted); margin-top:2px; }
+    .rec-fix summary { font-size:0.75rem; color:var(--accent); cursor:pointer; font-weight:600; margin-top:6px; }
+    .rec-fix-body { font-size:0.75rem; color:var(--text); margin-top:4px; padding:8px; background:var(--light); border-radius:6px; line-height:1.7; }
+    .sec-settings-label { font-size:0.85rem; font-weight:700; color:var(--primary); margin-bottom:4px; }
+    .sec-settings-hint  { font-size:0.78rem; color:var(--text-muted); margin-bottom:10px; }
+    .sec-setup-guide { background:var(--light); border-radius:8px; padding:12px; margin-bottom:12px; font-size:0.78rem; color:var(--text-muted); line-height:1.7; }
+    @media(max-width:900px) { .sec-layout { grid-template-columns: 1fr !important; } }
+
     /* Responsive */
     @media(max-width:1100px) { .stats-row { grid-template-columns: repeat(3,1fr); } }
     @media(max-width:900px) {
@@ -278,6 +296,8 @@
       <a href="#" onclick="showSection('addCar',this)"><span class="nav-icon">➕</span>Add New Car</a>
       <div class="nav-section-label">Operations</div>
       <a href="#" onclick="showSection('sellRequests',this)"><span class="nav-icon">💰</span>Sell Requests <span id="srBadge" class="admin-badge" style="margin-left:auto"></span></a>
+      <div class="nav-section-label">Security</div>
+      <a href="#" onclick="showSection('security',this)"><span class="nav-icon">🛡️</span>Security Monitor <span id="secBadge" class="admin-badge" style="margin-left:auto"></span></a>
       <div class="nav-section-label">Website</div>
       <a href="index.html" target="_blank"><span class="nav-icon">🌐</span>View Website</a>
       <a href="inventory.html" target="_blank"><span class="nav-icon">🔍</span>Inventory Page</a>
@@ -584,6 +604,104 @@
         </div>
       </div>
 
+      <!-- SECURITY MONITOR ─────────────────────────────── -->
+      <div class="admin-section" id="sec-security">
+
+        <!-- Critical alert banner -->
+        <div class="sec-banner" id="secAlertBanner">
+          <span style="font-size:1.5rem">🚨</span>
+          <div>
+            <strong style="color:#DC2626" id="secAlertTitle">Critical security alerts require attention</strong>
+            <div style="font-size:0.82rem;color:#991B1B;margin-top:2px" id="secAlertDesc"></div>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div id="secStats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px;margin-bottom:24px"></div>
+
+        <!-- Two-column layout -->
+        <div class="sec-layout" style="display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start">
+
+          <!-- Events table -->
+          <div class="panel-card">
+            <div class="panel-header" style="flex-wrap:wrap;gap:10px">
+              <h3>Security Events <span id="secEventCount" style="color:var(--text-muted);font-weight:400;font-size:0.82rem"></span></h3>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <select id="secFilter" onchange="loadSecurityLogs()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:0.82rem">
+                  <option value="">All Events</option>
+                  <option value="critical">Critical Only</option>
+                  <option value="warning">Warnings Only</option>
+                  <option value="info">Info Only</option>
+                </select>
+                <button class="btn btn-outline btn-sm" onclick="loadSecurityLogs()">↻ Refresh</button>
+                <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;border:1.5px solid #FCA5A5;min-height:36px" onclick="clearResolvedLogs()">Clear Resolved</button>
+              </div>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>Time</th><th>Severity</th><th>Event</th><th>Details</th><th>Action</th></tr></thead>
+                <tbody id="secLogsBody"><tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted)">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right column: Checklist + Settings -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+
+            <!-- Security checklist -->
+            <div class="panel-card">
+              <div class="panel-header"><h3>Security Checklist</h3></div>
+              <div style="padding:16px" id="secRecommendations"></div>
+            </div>
+
+            <!-- Alert settings -->
+            <div class="panel-card">
+              <div class="panel-header"><h3>⚙️ Alert Settings</h3></div>
+              <div style="padding:16px">
+
+                <!-- Browser notifications -->
+                <div class="sec-settings-label">Browser Notifications</div>
+                <p class="sec-settings-hint">Instant pop-up alert whenever a critical event occurs — only works while this tab is open.</p>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+                  <button class="btn btn-outline btn-sm" id="notifBtn" onclick="SEC.requestNotifPermission().then(updateNotifBtn)">Enable Notifications</button>
+                  <span id="notifStatus" style="font-size:0.78rem;color:var(--text-muted)"></span>
+                </div>
+
+                <hr style="border:none;border-top:1px solid var(--border);margin-bottom:16px">
+
+                <!-- Email alerts -->
+                <div class="sec-settings-label">Email Alerts <span style="font-size:0.72rem;color:var(--text-muted);font-weight:400">(via EmailJS — free)</span></div>
+                <p class="sec-settings-hint">Automatically email yourself when critical or warning events are detected — even when the admin panel is closed.</p>
+
+                <div class="sec-setup-guide">
+                  <strong style="color:var(--primary)">Quick Setup (5 minutes):</strong><br>
+                  1. Go to <a href="https://www.emailjs.com" target="_blank" style="color:var(--accent);font-weight:600">emailjs.com</a> → Sign up free<br>
+                  2. Add Email Service → connect your Gmail or Outlook<br>
+                  3. Create an Email Template with these variables:<br>
+                  &nbsp;&nbsp;<code>{{severity}}</code>, <code>{{event_type}}</code>, <code>{{description}}</code>,<br>
+                  &nbsp;&nbsp;<code>{{details}}</code>, <code>{{time}}</code>, <code>{{site_url}}</code><br>
+                  4. Copy Service ID, Template ID &amp; Public Key below
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <input class="form-control" id="ejServiceId"  placeholder="Service ID  (e.g. service_abc123)"  style="font-size:0.82rem">
+                  <input class="form-control" id="ejTemplateId" placeholder="Template ID (e.g. template_xyz789)" style="font-size:0.82rem">
+                  <input class="form-control" id="ejPublicKey"  placeholder="Public Key"                          style="font-size:0.82rem">
+                  <input class="form-control" id="ejEmail" type="email" placeholder="Your alert email address"   style="font-size:0.82rem">
+                  <div style="display:flex;gap:8px">
+                    <button class="btn btn-primary btn-sm btn-full" onclick="saveEmailConfig()">💾 Save Config</button>
+                    <button class="btn btn-outline btn-sm" onclick="testEmailAlert()" style="white-space:nowrap">Send Test</button>
+                  </div>
+                  <div id="ejStatus" style="font-size:0.78rem;text-align:center;min-height:18px"></div>
+                </div>
+
+              </div>
+            </div>
+
+          </div><!-- /right col -->
+        </div><!-- /sec-layout -->
+      </div><!-- /sec-security -->
+
     </div><!-- /admin-content -->
   </div><!-- /admin-main -->
 </div><!-- /admin-wrap -->
@@ -629,7 +747,9 @@
 
 <div class="toast-container" id="toastContainer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="js/data.js"></script>
+<script src="js/security.js"></script>
 <script>
 // ── MOBILE SIDEBAR ────────────────────────────────────────────────────────────
 function toggleSidebar() {
@@ -665,6 +785,7 @@ async function doLogin() {
     err.style.display = 'block';
     btn.disabled = false; btn.textContent = 'Sign In';
     document.getElementById('loginPass').value = '';
+    SEC.trackFailedLogin(input);
     return;
   }
   document.getElementById('loginScreen').style.display = 'none';
@@ -682,7 +803,8 @@ const sectionTitles = {
   dashboard: 'Dashboard',
   cars: 'Manage Vehicles',
   addCar: 'Add New Vehicle',
-  sellRequests: 'Sell Requests'
+  sellRequests: 'Sell Requests',
+  security: '🛡️ Security Monitor'
 };
 
 async function showSection(name, linkEl) {
@@ -694,13 +816,15 @@ async function showSection(name, linkEl) {
   if (name === 'cars') await renderCarsTable();
   if (name === 'sellRequests') await renderSRTable();
   if (name === 'dashboard') await renderDashboard();
+  if (name === 'security') { await loadSecurityLogs(); renderSecRecommendations(); loadEmailConfig(); updateNotifBtn(); }
   document.getElementById('adminSidebar').classList.remove('open');
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 async function initAdmin() {
   initPhotoSlots();
-  await Promise.all([renderDashboard(), renderCarsTable(), renderSRTable(), updateSRBadge()]);
+  await Promise.all([renderDashboard(), renderCarsTable(), renderSRTable(), updateSRBadge(), updateSecBadge()]);
+  SEC.clearLoginAttempts();
 }
 
 async function updateSRBadge() {
@@ -1279,6 +1403,220 @@ async function viewSR(id) {
     if (e.target === this) { this.classList.remove('open'); }
   });
 });
+
+// ── SECURITY MONITOR ──────────────────────────────────────────────────────────
+
+async function updateSecBadge() {
+  try {
+    const { data } = await _sb.from('security_logs')
+      .select('id', { count: 'exact', head: false })
+      .in('severity', ['critical', 'warning'])
+      .eq('resolved', false);
+    const count = data ? data.length : 0;
+    const badge = document.getElementById('secBadge');
+    if (badge) badge.textContent = count > 0 ? count : '';
+  } catch {}
+}
+
+async function loadSecurityLogs() {
+  const filter = document.getElementById('secFilter')?.value;
+  let q = _sb.from('security_logs').select('*').order('created_at', { ascending: false }).limit(100);
+  if (filter) q = q.eq('severity', filter);
+  const { data, error } = await q;
+  if (error) { console.error(error); return; }
+
+  const logs = data || [];
+  const critical = logs.filter(l => l.severity === 'critical' && !l.resolved);
+  const warnings  = logs.filter(l => l.severity === 'warning'  && !l.resolved);
+
+  document.getElementById('secEventCount').textContent = `(${logs.length})`;
+
+  // Stats cards
+  document.getElementById('secStats').innerHTML = `
+    <div class="stat-card red"  ><div class="stat-icon">🚨</div><div class="stat-num">${critical.length}</div><div class="stat-lbl">Critical Alerts</div></div>
+    <div class="stat-card gold" ><div class="stat-icon">⚠️</div><div class="stat-num">${warnings.length}</div><div class="stat-lbl">Warnings</div></div>
+    <div class="stat-card blue" ><div class="stat-icon">📋</div><div class="stat-num">${logs.length}</div><div class="stat-lbl">Total Events</div></div>
+    <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-num">${logs.filter(l => l.resolved).length}</div><div class="stat-lbl">Resolved</div></div>`;
+
+  // Alert banner
+  const banner = document.getElementById('secAlertBanner');
+  if (critical.length > 0) {
+    banner.classList.add('show');
+    document.getElementById('secAlertTitle').textContent =
+      `${critical.length} critical alert${critical.length > 1 ? 's' : ''} require your attention`;
+    document.getElementById('secAlertDesc').textContent = critical[0].description || '';
+  } else {
+    banner.classList.remove('show');
+  }
+
+  // Update sidebar badge
+  const badge = document.getElementById('secBadge');
+  const unresolved = critical.length + warnings.length;
+  if (badge) badge.textContent = unresolved > 0 ? unresolved : '';
+
+  // Table rows
+  const tbody = document.getElementById('secLogsBody');
+  if (logs.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">🛡️ No security events recorded yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = logs.map(l => {
+    const sevBadge =
+      l.severity === 'critical' ? '<span class="badge badge-sold">🚨 Critical</span>' :
+      l.severity === 'warning'  ? '<span class="badge badge-pending">⚠️ Warning</span>' :
+                                  '<span class="badge badge-available">ℹ Info</span>';
+    const time    = new Date(l.created_at).toLocaleString('en-ZA', { dateStyle:'short', timeStyle:'short' });
+    const type    = (l.event_type || '').replace(/_/g, ' ');
+    const metaStr = l.metadata ? JSON.stringify(l.metadata) : '';
+    const dim     = l.resolved ? ' style="opacity:0.45"' : '';
+    return `<tr${dim}>
+      <td style="font-size:0.75rem;white-space:nowrap">${time}</td>
+      <td>${sevBadge}</td>
+      <td>
+        <div class="tbl-title" style="font-size:0.82rem;text-transform:capitalize">${type}</div>
+        <div class="tbl-sub">${(l.description || '').slice(0, 90)}${l.description && l.description.length > 90 ? '…' : ''}</div>
+      </td>
+      <td style="font-size:0.72rem;color:var(--text-muted);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${metaStr}">${metaStr.slice(0, 55)}${metaStr.length > 55 ? '…' : ''}</td>
+      <td>${l.resolved
+        ? '<span style="font-size:0.75rem;color:var(--text-muted)">Resolved</span>'
+        : `<button class="btn-xs btn-view" onclick="resolveSecEvent('${l.id}')">✓ Resolve</button>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function resolveSecEvent(id) {
+  await _sb.from('security_logs').update({ resolved: true }).eq('id', id);
+  loadSecurityLogs();
+}
+
+async function clearResolvedLogs() {
+  if (!confirm('Delete all resolved security events? This cannot be undone.')) return;
+  await _sb.from('security_logs').delete().eq('resolved', true);
+  loadSecurityLogs();
+}
+
+function renderSecRecommendations() {
+  const items = [
+    { done: true,  icon: '✅', title: 'RLS enabled — database access locked down',      desc: 'All Supabase tables use Row Level Security. Strangers cannot read or modify your data.' },
+    { done: true,  icon: '✅', title: 'Admin requires authentication',                   desc: 'The admin panel is fully protected — only logged-in users can access it.' },
+    { done: true,  icon: '✅', title: 'HTTPS enforced via GitHub Pages',                 desc: 'All traffic is encrypted. Plain HTTP connections are automatically redirected.' },
+    { done: true,  icon: '✅', title: 'No SQL injection risk (parameterised queries)',   desc: 'Supabase SDK handles all queries safely — no raw SQL string building.' },
+    { done: false, icon: '🔴', title: 'Remove admin emails from source code',
+      desc: 'Your email addresses are visible to anyone who views the page source in a browser.',
+      fix: 'In admin.html, delete the <code>_adminMap</code> variable. Register admin users directly in Supabase → Authentication → Users. Then change the login to use only the typed email.' },
+    { done: false, icon: '🔴', title: 'Add CAPTCHA to the Sell Form',
+      desc: 'The sell form has no bot protection. Automated tools can submit thousands of fake requests.',
+      fix: 'Sign up at <strong>google.com/recaptcha</strong> (free). Add the reCAPTCHA v3 script to sell.html, verify the token before calling DB.addSellRequest().' },
+    { done: false, icon: '🟡', title: 'Configure email alerts (below)',
+      desc: 'You will not receive notifications for suspicious activity until EmailJS is configured.',
+      fix: 'Use the Email Alerts form below. It takes about 5 minutes to set up a free EmailJS account.' },
+    { done: false, icon: '🟡', title: 'Add admin session auto-timeout',
+      desc: 'The admin panel stays logged in forever — a risk if you leave a device unattended.',
+      fix: 'Add inactivity detection: reset a timer on every mouse/key event and call <code>doLogout()</code> after 30 minutes of no activity.' },
+    { done: false, icon: '🟡', title: 'Create Terms & Privacy Policy pages',
+      desc: 'The sell form links to T&Cs and Privacy Policy that do not exist. Required by POPIA law.',
+      fix: 'Create <code>terms.html</code> and <code>privacy.html</code>. Update the links in sell.html lines 237–238.' },
+    { done: false, icon: '🟢', title: 'Hide the Admin link from public navigation',
+      desc: 'The Admin button in the site navbar tells visitors where your admin panel is.',
+      fix: 'Remove the Admin nav link from index.html, inventory.html, sell.html, and about.html. You can still access admin.html by typing the URL directly.' },
+    { done: false, icon: '🟢', title: 'Add Content Security Policy (CSP) headers',
+      desc: 'CSP prevents attackers from injecting malicious scripts into your pages.',
+      fix: 'Create a file named <code>_headers</code> in your repo root. Add: <code>/*\\n  Content-Security-Policy: default-src \'self\' ...</code>' },
+  ];
+
+  const done  = items.filter(i => i.done).length;
+  const score = Math.round((done / items.length) * 100);
+  const color = score >= 75 ? '#15803D' : score >= 45 ? '#B45309' : '#DC2626';
+
+  document.getElementById('secRecommendations').innerHTML = `
+    <div style="text-align:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+      <div style="font-size:2rem;font-weight:900;color:${color}">${score}%</div>
+      <div style="font-size:0.78rem;color:var(--text-muted)">Security Score — ${done} of ${items.length} items complete</div>
+      <div class="sec-score-bar"><div class="sec-score-fill" style="width:${score}%;background:${color}"></div></div>
+    </div>
+    ${items.map(i => `
+      <div class="rec-item${i.done ? ' done' : ''}">
+        <div class="rec-icon">${i.icon}</div>
+        <div>
+          <div class="rec-title">${i.title}</div>
+          <div class="rec-desc">${i.desc}</div>
+          ${!i.done && i.fix ? `<details class="rec-fix"><summary>How to fix ▸</summary><div class="rec-fix-body">${i.fix}</div></details>` : ''}
+        </div>
+      </div>`).join('')}`;
+}
+
+// ── EMAIL CONFIG ──────────────────────────────────────────────────────────────
+function loadEmailConfig() {
+  const cfg = JSON.parse(localStorage.getItem('_emsec') || 'null');
+  if (!cfg) return;
+  document.getElementById('ejServiceId').value  = cfg.sid   || '';
+  document.getElementById('ejTemplateId').value = cfg.tid   || '';
+  document.getElementById('ejPublicKey').value  = cfg.key   || '';
+  document.getElementById('ejEmail').value      = cfg.email || '';
+}
+
+function saveEmailConfig() {
+  const cfg = {
+    sid:   document.getElementById('ejServiceId').value.trim(),
+    tid:   document.getElementById('ejTemplateId').value.trim(),
+    key:   document.getElementById('ejPublicKey').value.trim(),
+    email: document.getElementById('ejEmail').value.trim()
+  };
+  const st = document.getElementById('ejStatus');
+  if (!cfg.sid || !cfg.tid || !cfg.key || !cfg.email) {
+    st.textContent = '⚠️ Please fill in all four fields.';
+    st.style.color = 'var(--danger)'; return;
+  }
+  localStorage.setItem('_emsec', JSON.stringify(cfg));
+  st.textContent = '✅ Config saved! Use "Send Test" to verify it works.';
+  st.style.color = 'var(--success)';
+  renderSecRecommendations();
+}
+
+async function testEmailAlert() {
+  const cfg = JSON.parse(localStorage.getItem('_emsec') || 'null');
+  const st  = document.getElementById('ejStatus');
+  if (!cfg) { st.textContent = '⚠️ Save your config first.'; st.style.color = 'var(--danger)'; return; }
+  if (!window.emailjs) { st.textContent = '⚠️ EmailJS not loaded — check your internet connection.'; st.style.color = 'var(--danger)'; return; }
+  st.textContent = 'Sending test email…'; st.style.color = 'var(--text-muted)';
+  try {
+    await emailjs.send(cfg.sid, cfg.tid, {
+      to_email:    cfg.email,
+      severity:    'TEST',
+      event_type:  'TEST ALERT',
+      description: 'This is a test alert from Eutopia Motors Admin Panel. Your email alerts are working correctly.',
+      details:     '{"test": true, "source": "admin panel"}',
+      time:        new Date().toLocaleString('en-ZA', { dateStyle:'medium', timeStyle:'short' }),
+      site_url:    location.origin
+    }, cfg.key);
+    st.textContent = '✅ Test email sent! Check your inbox.';
+    st.style.color = 'var(--success)';
+  } catch (e) {
+    st.textContent = `❌ Failed: ${e.text || e.message || 'Check your Service ID / Template ID / Public Key'}`;
+    st.style.color = 'var(--danger)';
+  }
+}
+
+function updateNotifBtn() {
+  const btn = document.getElementById('notifBtn');
+  const st  = document.getElementById('notifStatus');
+  if (!btn) return;
+  if (!('Notification' in window)) {
+    st.textContent = 'Not supported in this browser.'; btn.disabled = true; return;
+  }
+  if (Notification.permission === 'granted') {
+    btn.textContent = '✅ Notifications Enabled'; btn.disabled = true;
+    st.textContent  = 'You will receive browser pop-ups for critical events.';
+    st.style.color  = 'var(--success)';
+  } else if (Notification.permission === 'denied') {
+    btn.textContent = 'Notifications Blocked'; btn.disabled = true;
+    st.textContent  = 'Blocked in browser settings — go to browser Settings → Site Settings to re-enable.';
+    st.style.color  = 'var(--danger)';
+  } else {
+    btn.textContent = 'Enable Notifications'; btn.disabled = false;
+    st.textContent  = '';
+  }
+}
 
 // ── Bootstrap: restore session from Supabase Auth ────────────────────────────
 (async () => {
