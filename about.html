@@ -60,7 +60,7 @@
     }
   </style>
 </head>
-<body>
+<body class="has-fab">
 
 <nav class="navbar">
   <div class="nav-inner">
@@ -73,9 +73,10 @@
       <a href="admin.html" class="nav-cta">Admin</a>
     </div>
     <div class="nav-phone">📞 0800 EUTOPIA</div>
-    <div class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></div>
+    <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
   </div>
 </nav>
+<div class="nav-overlay" id="navOverlay"></div>
 
 <div class="breadcrumb"><div class="container"><div class="breadcrumb-inner"><a href="index.html">Home</a><span>›</span><span>About Us</span></div></div></div>
 
@@ -260,5 +261,24 @@
   <div>© 2025 Eutopia Motors (Pty) Ltd &nbsp;|&nbsp; <a href="index.html" style="color:var(--gold)">Back to Home</a></div>
 </footer>
 
+<!-- FLOATING ACTION BAR -->
+<div class="fab-bar">
+  <a href="tel:0800388674" class="fab-btn fab-call">📞 Call Us</a>
+  <a href="https://wa.me/27800387682" class="fab-btn fab-whatsapp" target="_blank" rel="noopener">💬 WhatsApp</a>
+</div>
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+<script>
+  (function(){
+    const toggle = document.getElementById('navToggle');
+    const links  = document.getElementById('navLinks');
+    const overlay = document.getElementById('navOverlay');
+    function openNav()  { links.classList.add('open'); overlay.classList.add('open'); document.body.style.overflow='hidden'; }
+    function closeNav() { links.classList.remove('open'); overlay.classList.remove('open'); document.body.style.overflow=''; }
+    toggle.addEventListener('click', () => links.classList.contains('open') ? closeNav() : openNav());
+    overlay.addEventListener('click', closeNav);
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', closeNav));
+  })();
+  window.addEventListener('scroll', () => document.getElementById('backTop').classList.toggle('show', window.scrollY > 400));
+</script>
 </body>
 </html>

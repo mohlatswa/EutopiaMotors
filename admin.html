@@ -230,12 +230,13 @@
     /* Responsive */
     @media(max-width:1100px) { .stats-row { grid-template-columns: repeat(3,1fr); } }
     @media(max-width:900px) {
-      .admin-sidebar { transform: translateX(-100%); }
+      .admin-sidebar { transform: translateX(-100%); left: 0; }
       .admin-sidebar.open { transform: translateX(0); }
       .admin-main { margin-left: 0; }
       .sidebar-toggle { display: block; }
       .form-grid { grid-template-columns: 1fr; }
       .form-group.full { grid-column: 1; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
     }
     @media(max-width:600px) {
       .stats-row { grid-template-columns: 1fr 1fr; }
@@ -260,6 +261,7 @@
 </div>
 
 <!-- ── ADMIN SHELL ─────────────────────────────────────────────────────────── -->
+<div class="admin-sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="admin-wrap" id="adminShell" style="display:none">
 
   <!-- Sidebar -->
@@ -290,7 +292,7 @@
   <div class="admin-main">
     <header class="admin-topbar">
       <div style="display:flex;align-items:center;gap:12px">
-        <button class="sidebar-toggle" onclick="document.getElementById('adminSidebar').classList.toggle('open')">☰</button>
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
         <div class="topbar-title" id="topbarTitle">Dashboard</div>
       </div>
       <div class="topbar-right">
@@ -629,6 +631,24 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/data.js"></script>
 <script>
+// ── MOBILE SIDEBAR ────────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const s = document.getElementById('adminSidebar');
+  const o = document.getElementById('sidebarOverlay');
+  const open = s.classList.toggle('open');
+  o.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+function closeSidebar() {
+  document.getElementById('adminSidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+// Close sidebar when a nav link is clicked on mobile
+document.querySelectorAll('.admin-nav a').forEach(a => a.addEventListener('click', () => {
+  if (window.innerWidth <= 900) closeSidebar();
+}));
+
 // ── AUTH (Supabase) ────────────────────────────────────────────────────────────
 const _adminMap = { 'admin': 'admin@eutopiamotor.com', 'mohlatswa': 'mohlatswa96@gmail.com' };
 async function doLogin() {

@@ -21,7 +21,7 @@
     @media(max-width:600px){ .car-list-item{grid-template-columns:1fr;} .car-list-img{height:200px;} }
   </style>
 </head>
-<body>
+<body class="has-fab">
 
 <nav class="navbar">
   <div class="nav-inner">
@@ -36,9 +36,10 @@
       <a href="admin.html" class="nav-cta">Admin</a>
     </div>
     <div class="nav-phone">📞 0800 EUTOPIA</div>
-    <div class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></div>
+    <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
   </div>
 </nav>
+<div class="nav-overlay" id="navOverlay"></div>
 
 <div class="breadcrumb"><div class="container"><div class="breadcrumb-inner"><a href="index.html">Home</a><span>›</span><span>Buy a Car</span></div></div></div>
 
@@ -47,9 +48,10 @@
 
     <!-- FILTER PANEL -->
     <div>
-      <button class="filter-mobile-toggle" onclick="document.getElementById('filterPanel').classList.toggle('open')">⚙️ Filters</button>
+      <button class="filter-mobile-toggle" id="filterToggle">⚙️ Filters</button>
+      <div class="filter-overlay" id="filterOverlay"></div>
       <div class="filter-panel" id="filterPanel">
-        <h3>Filters <button class="filter-reset" onclick="resetFilters()" style="font-size:0.75rem;padding:4px 10px">Clear All</button></h3>
+        <h3>Filters <button class="filter-reset" onclick="resetFilters()" style="font-size:0.75rem;padding:4px 10px">Clear All</button><button class="filter-drawer-close" id="filterClose" title="Close filters">✕</button></h3>
 
         <div class="filter-group">
           <label>Search</label>
@@ -155,9 +157,43 @@
   <div>© 2025 Eutopia Motors (Pty) Ltd &nbsp;|&nbsp; <a href="index.html" style="color:var(--gold)">Back to Home</a></div>
 </footer>
 
+<!-- FLOATING ACTION BAR -->
+<div class="fab-bar">
+  <a href="tel:0800388674" class="fab-btn fab-call">📞 Call Us</a>
+  <a href="https://wa.me/27800387682" class="fab-btn fab-whatsapp" target="_blank" rel="noopener">💬 WhatsApp</a>
+</div>
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
 <div class="toast-container" id="toastContainer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/data.js"></script>
+<script>
+  // Nav
+  (function(){
+    const toggle = document.getElementById('navToggle');
+    const links  = document.getElementById('navLinks');
+    const overlay = document.getElementById('navOverlay');
+    function openNav()  { links.classList.add('open'); overlay.classList.add('open'); document.body.style.overflow='hidden'; }
+    function closeNav() { links.classList.remove('open'); overlay.classList.remove('open'); document.body.style.overflow=''; }
+    toggle.addEventListener('click', () => links.classList.contains('open') ? closeNav() : openNav());
+    overlay.addEventListener('click', closeNav);
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', closeNav));
+  })();
+  // Filter drawer
+  (function(){
+    const panel   = document.getElementById('filterPanel');
+    const fOverlay= document.getElementById('filterOverlay');
+    const btn     = document.getElementById('filterToggle');
+    const close   = document.getElementById('filterClose');
+    function openFilter()  { panel.classList.add('open'); fOverlay.classList.add('open'); document.body.style.overflow='hidden'; }
+    function closeFilter() { panel.classList.remove('open'); fOverlay.classList.remove('open'); document.body.style.overflow=''; }
+    btn.addEventListener('click', openFilter);
+    fOverlay.addEventListener('click', closeFilter);
+    if (close) close.addEventListener('click', closeFilter);
+  })();
+  // Back to top
+  window.addEventListener('scroll', () => document.getElementById('backTop').classList.toggle('show', window.scrollY > 400));
+</script>
 <script>
   let currentView = 'grid';
   let currentPage = 1;
